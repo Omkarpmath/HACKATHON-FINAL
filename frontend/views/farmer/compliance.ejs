@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Compliance Tracker - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            z-index: 100;
+            top: 100%;
+            left: 0;
+            margin-top: 0px;
+            /* Remove gap */
+            padding-top: 8px;
+            /* Add internal padding instead */
+        }
+
+        .dropdown-content a {
+            color: #374151;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f3f4f6;
+            color: #059669;
+        }
+
+        .dropdown-content a:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-trigger {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Ensure dropdown stays visible when hovering over content */
+        .dropdown-content:hover {
+            display: block;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+        }
+
+        .checkbox-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .checkbox-item:last-child {
+            border-bottom: none;
+        }
+
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">🏠 Dashboard</a>
+
+                    <!-- Farm Management Dropdown -->
+                    <div class="dropdown">
+                        <span class="dropdown-trigger text-emerald-600 font-semibold">🌾 Farm ▾</span>
+                        <div class="dropdown-content">
+                            <a href="/animals/add">➕ Add Animal</a>
+                            <a href="/dashboard">📊 My Animals</a>
+                            <a href="/ai-assistant">🩺 AI Diagnosis</a>
+                            <a href="/guide/medicine-guide">💊 Medicine Guide</a>
+                            <a href="/compliance">✅ Biosecurity</a>
+                        </div>
+                    </div>
+
+                    <!-- Commerce Dropdown -->
+                    <div class="dropdown">
+                        <span class="dropdown-trigger text-gray-700 hover:text-emerald-600 transition">💼 Commerce
+                            ▾</span>
+                        <div class="dropdown-content">
+                            <a href="/marketplace">🛒 Browse Marketplace</a>
+                            <a href="/list-product">➕ List Product</a>
+                            <a href="/my-products">📦 My Products</a>
+                            <a href="/orders/sales">💰 Sales</a>
+                        </div>
+                    </div>
+
+                    <a href="/community" class="text-gray-700 hover:text-emerald-600 transition">👥 Community</a>
+                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Daily Compliance Tracker</h1>
+            <p class="text-gray-600 mt-2">Complete your daily biosecurity checklist</p>
+        </div>
+
+        <!-- Compliance Score Card -->
+        <div class="card mb-8 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-1">Today's Compliance Score</h2>
+                    <p class="text-sm text-gray-600">7-Day Average: <%= averageScore %>%</p>
+                </div>
+                <div class="text-right">
+                    <div id="scoreDisplay"
+                        class="text-5xl font-bold <%= score >= 80 ? 'text-green-600' : score >= 50 ? 'text-yellow-600' : 'text-red-600' %>">
+                        <%= score %>%
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Water Section -->
+        <div class="card mb-6">
+            <div class="flex items-center mb-4 pb-4 border-b border-gray-200">
+                <span class="text-3xl mr-3">💧</span>
+                <h3 class="text-xl font-bold text-gray-900">Water</h3>
+            </div>
+            <% checklist.water.forEach(item=> { %>
+                <div class="checkbox-item">
+                    <input type="checkbox" class="checkbox-input" id="<%= item.id %>"
+                        <%=completedItems.includes(item.id) ? 'checked' : '' %>
+                    onchange="toggleItem('<%= item.id %>')">
+                        <div class="flex-1">
+                            <label for="<%= item.id %>" class="font-medium text-gray-900 cursor-pointer">
+                                <%= item.name %>
+                            </label>
+                            <p class="text-sm text-gray-500">
+                                <%= item.frequency %>
+                            </p>
+                        </div>
+                </div>
+                <% }) %>
+        </div>
+
+        <!-- Feed Section -->
+        <div class="card mb-6">
+            <div class="flex items-center mb-4 pb-4 border-b border-gray-200">
+                <span class="text-3xl mr-3">🌾</span>
+                <h3 class="text-xl font-bold text-gray-900">Feed</h3>
+            </div>
+            <% checklist.feed.forEach(item=> { %>
+                <div class="checkbox-item">
+                    <input type="checkbox" class="checkbox-input" id="<%= item.id %>"
+                        <%=completedItems.includes(item.id) ? 'checked' : '' %>
+                    onchange="toggleItem('<%= item.id %>')">
+                        <div class="flex-1">
+                            <label for="<%= item.id %>" class="font-medium text-gray-900 cursor-pointer">
+                                <%= item.name %>
+                            </label>
+                            <p class="text-sm text-gray-500">
+                                <%= item.frequency %>
+                            </p>
+                        </div>
+                </div>
+                <% }) %>
+        </div>
+
+        <!-- Biosecurity Section -->
+        <div class="card mb-6">
+            <div class="flex items-center mb-4 pb-4 border-b border-gray-200">
+                <span class="text-3xl mr-3">🛡️</span>
+                <h3 class="text-xl font-bold text-gray-900">Biosecurity</h3>
+            </div>
+            <% checklist.biosecurity.forEach(item=> { %>
+                <div class="checkbox-item">
+                    <input type="checkbox" class="checkbox-input" id="<%= item.id %>"
+                        <%=completedItems.includes(item.id) ? 'checked' : '' %>
+                    onchange="toggleItem('<%= item.id %>')">
+                        <div class="flex-1">
+                            <label for="<%= item.id %>" class="font-medium text-gray-900 cursor-pointer">
+                                <%= item.name %>
+                            </label>
+                            <p class="text-sm text-gray-500">
+                                <%= item.frequency %>
+                            </p>
+                        </div>
+                </div>
+                <% }) %>
+        </div>
+
+        <!-- Health Section -->
+        <div class="card mb-6">
+            <div class="flex items-center mb-4 pb-4 border-b border-gray-200">
+                <span class="text-3xl mr-3">🏥</span>
+                <h3 class="text-xl font-bold text-gray-900">Health</h3>
+            </div>
+            <% checklist.health.forEach(item=> { %>
+                <div class="checkbox-item">
+                    <input type="checkbox" class="checkbox-input" id="<%= item.id %>"
+                        <%=completedItems.includes(item.id) ? 'checked' : '' %>
+                    onchange="toggleItem('<%= item.id %>')">
+                        <div class="flex-1">
+                            <label for="<%= item.id %>" class="font-medium text-gray-900 cursor-pointer">
+                                <%= item.name %>
+                            </label>
+                            <p class="text-sm text-gray-500">
+                                <%= item.frequency %>
+                            </p>
+                        </div>
+                </div>
+                <% }) %>
+        </div>
+    </main>
+
+    <script>
+        async function toggleItem(itemId) {
+            try {
+                const response = await fetch('/api/compliance/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemId })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update score display
+                    const scoreDisplay = document.getElementById('scoreDisplay');
+                    scoreDisplay.textContent = result.score + '%';
+
+                    // Update color based on score
+                    scoreDisplay.className = result.score >= 80 ? 'text-5xl font-bold text-green-600' :
+                        result.score >= 50 ? 'text-5xl font-bold text-yellow-600' :
+                            'text-5xl font-bold text-red-600';
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to update compliance. Please try again.');
+            }
+        }
+    </script>
+</body>
+
+</html>

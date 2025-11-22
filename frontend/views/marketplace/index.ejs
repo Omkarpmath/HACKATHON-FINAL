@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 via-white to-emerald-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/marketplace" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/marketplace" class="text-emerald-600 font-semibold">Marketplace</a>
+                    <% if (user.role==='buyer' ) { %>
+                        <a href="/orders/my-orders" class="text-gray-700 hover:text-emerald-600 transition">My
+                            Orders</a>
+                        <% } %>
+                            <% if (user.role==='farmer' ) { %>
+                                <a href="/dashboard"
+                                    class="text-gray-700 hover:text-emerald-600 transition">Dashboard</a>
+                                <% } %>
+                                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                                    <form action="/logout" method="POST" class="inline">
+                                        <button type="submit"
+                                            class="text-red-600 hover:text-red-700 transition">Logout</button>
+                                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Hero Banner -->
+        <div class="bg-gradient-to-r from-emerald-600 to-green-600 rounded-xl p-8 mb-8 text-white">
+            <h1 class="text-3xl font-bold mb-2">🛡️ Bio-Safe Verified Marketplace</h1>
+            <p class="text-emerald-50">All products are verified antibiotic-free with complete medical transparency</p>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="card mb-8 bg-gradient-to-r from-blue-50 to-emerald-50">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">🔍 Search & Filter Products</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Search Bar -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <input type="text" id="searchInput" placeholder="Search by product type..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
+                <!-- Price Range -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Max Price (₹)</label>
+                    <input type="number" id="priceFilter" placeholder="Max price..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
+                <!-- Min Quantity Available -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Min Available Quantity</label>
+                    <input type="number" id="quantityFilter" placeholder="Min quantity..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
+                <!-- Clear Filters Button -->
+                <div class="flex items-end">
+                    <button onclick="clearFilters()"
+                        class="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <% if (products.length===0) { %>
+            <div class="text-center py-16 card">
+                <div class="text-6xl mb-4">🛒</div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">No products available yet</h2>
+                <p class="text-gray-600">Check back soon for verified livestock products</p>
+            </div>
+            <% } else { %>
+                <div class="mb-6" id="productCount">
+                    <p class="text-gray-600">Showing <span id="visibleCount">
+                            <%= products.length %>
+                        </span> of <%= products.length %> verified product<%= products.length !==1 ? 's' : '' %>
+                    </p>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <% products.forEach(product=> { %>
+                        <% // Backwards compatibility: handle old products without quantity fields const
+                            hasQuantitySystem=product.pricePerUnit !==undefined && product.totalQuantity !==undefined;
+                            const availableQty=hasQuantitySystem ? (product.totalQuantity - (product.quantitySold || 0))
+                            : (product.quantity || 0); %>
+                            <div class="card hover:shadow-xl transition-all duration-300 product-card"
+                                data-product-type="<%= product.productType.toLowerCase() %>"
+                                data-price="<%= product.pricePerUnit || product.price || 0 %>"
+                                data-quantity="<%= availableQty %>">
+                                <!-- Verified Badge -->
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-2xl font-bold text-gray-900">
+                                        <%= product.productType %>
+                                    </h3>
+                                    <span class="badge-verified">✅ Verified</span>
+                                </div>
+
+                                <!-- Pricing Info -->
+                                <% if (hasQuantitySystem) { %>
+                                    <!-- New quantity-based system -->
+                                    <div class="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4 mb-4">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-gray-700 text-sm">Price per <%= product.unit.slice(0, -1)
+                                                    %></span>
+                                            <span class="text-2xl font-bold text-emerald-600">₹<%=
+                                                    product.pricePerUnit.toFixed(2) %></span>
+                                        </div>
+                                        <div class="flex justify-between items-center text-sm">
+                                            <span class="text-gray-600">Available:</span>
+                                            <span
+                                                class="font-semibold <%= availableQty < product.totalQuantity * 0.2 ? 'text-red-600' : 'text-gray-900' %>">
+                                                <%= availableQty.toFixed(1) %> / <%= product.totalQuantity %>
+                                                        <%= product.unit %>
+                                            </span>
+                                        </div>
+                                        <% if (product.minOrderQuantity && product.minOrderQuantity> 1) { %>
+                                            <div class="text-xs text-gray-600 mt-1">Min order: <%=
+                                                    product.minOrderQuantity %>
+                                                    <%= product.unit %>
+                                            </div>
+                                            <% } %>
+                                    </div>
+                                    <% } else { %>
+                                        <!-- Old fixed-price system (backwards compatibility) -->
+                                        <div class="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4 mb-4">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-gray-700 text-sm">Price</span>
+                                                <span class="text-2xl font-bold text-emerald-600">₹<%= (product.price ||
+                                                        0).toFixed(2) %></span>
+                                            </div>
+                                            <% if (product.quantity) { %>
+                                                <div class="text-sm text-gray-600 mt-1">Quantity: <%= product.quantity
+                                                        %>
+                                                        <%= product.unit %>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                        <% } %>
+                                            <!-- Order Section (Buyers Only) -->
+                                            <% if (user.role==='buyer' ) { %>
+                                                <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity
+                                                        to
+                                                        order:</label>
+                                                    <div class="flex items-center space-x-2">
+                                                        <input type="number" id="qty-<%= product._id %>"
+                                                            min="<%= product.minOrderQuantity %>"
+                                                            max="<%= availableQty %>" step="0.1"
+                                                            value="<%= product.minOrderQuantity %>"
+                                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                                                            oninput="updateTotal('<%= product._id %>', <%= product.pricePerUnit %>, '<%= product.unit %>')">
+                                                        <span class="text-gray-600">
+                                                            <%= product.unit %>
+                                                        </span>
+                                                    </div>
+                                                    <div class="mt-2 text-center">
+                                                        <span class="text-sm text-gray-600">Total: </span>
+                                                        <span id="total-<%= product._id %>"
+                                                            class="text-lg font-bold text-emerald-600">
+                                                            ₹<%= (product.minOrderQuantity *
+                                                                product.pricePerUnit).toFixed(2) %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Delivery Address -->
+                                                <div class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">📍
+                                                        Delivery Address *</label>
+                                                    <textarea id="address-<%= product._id %>" rows="3"
+                                                        placeholder="Enter your complete delivery address..."
+                                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+                                                        required></textarea>
+                                                    <p class="text-xs text-gray-600 mt-1">Estimated delivery: 5 business
+                                                        days</p>
+                                                </div>
+
+                                                <!-- Payment Method -->
+                                                <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">💳
+                                                        Payment Method</label>
+                                                    <select id="payment-<%= product._id %>"
+                                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                                                        <option value="Cash on Delivery">Cash on Delivery</option>
+                                                        <option value="UPI">UPI</option>
+                                                        <option value="Bank Transfer">Bank Transfer</option>
+                                                        <option value="Card Payment">Card Payment</option>
+                                                    </select>
+                                                </div>
+                                                <% } %>
+
+                                                    <!-- Source Animal Info -->
+                                                    <% if (product.animal) { %>
+                                                        <div
+                                                            class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                                                            <div class="text-xs text-gray-600 mb-1">🐮 Source Animal
+                                                            </div>
+                                                            <div class="font-semibold text-gray-900">
+                                                                <%= product.animal.tagId %>
+                                                            </div>
+                                                            <div class="text-sm text-gray-600">
+                                                                <%= product.animal.species %>
+                                                                    <%= product.animal.breed ? '- ' +
+                                                                        product.animal.breed : '' %>
+                                                            </div>
+                                                            <div class="mt-2">
+                                                                <div class="text-xs text-gray-600 mb-1">Health Score
+                                                                </div>
+                                                                <div class="flex items-center space-x-2">
+                                                                    <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                                                        <div class="h-2 rounded-full bg-health-good"
+                                                                            style="width: <%= product.animal.healthScore %>%">
+                                                                        </div>
+                                                                    </div>
+                                                                    <span
+                                                                        class="text-sm font-semibold text-emerald-600">
+                                                                        <%= product.animal.healthScore %>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <% } %>
+
+                                                            <% if (product.description) { %>
+                                                                <p class="text-gray-600 text-sm mb-4">
+                                                                    <%= product.description %>
+                                                                </p>
+                                                                <% } %>
+
+                                                                    <!-- Actions -->
+                                                                    <% if (user.role==='buyer' ) { %>
+                                                                        <button
+                                                                            onclick="placeOrder('<%= product._id %>')"
+                                                                            class="w-full px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold">
+                                                                            Order 🛒
+                                                                        </button>
+                                                                        <% } %>
+
+                                                                            <div
+                                                                                class="mt-3 text-xs text-gray-500 text-center">
+                                                                                Listed <%= new
+                                                                                    Date(product.createdAt).toLocaleDateString('en-IN')
+                                                                                    %>
+                                                                            </div>
+                            </div>
+                            <% }) %>
+                </div>
+                <% } %>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 JeevBandhu. Building trust through transparency.</p>
+        </div>
+    </footer>
+
+    <script>
+        function updateTotal(productId, pricePerUnit, unit) {
+            const qtyInput = document.getElementById(`qty-${productId}`);
+            const totalSpan = document.getElementById(`total-${productId}`);
+            const qty = parseFloat(qtyInput.value) || 0;
+            const total = qty * pricePerUnit;
+            totalSpan.textContent = `₹${total.toFixed(2)}`;
+        }
+
+        async function placeOrder(productId) {
+            const qtyInput = document.getElementById(`qty-${productId}`);
+            const quantity = parseFloat(qtyInput.value);
+            const addressInput = document.getElementById(`address-${productId}`);
+            const deliveryAddress = addressInput ? addressInput.value.trim() : '';
+            const paymentSelect = document.getElementById(`payment-${productId}`);
+            const paymentMethod = paymentSelect ? paymentSelect.value : 'Cash on Delivery';
+
+            if (!quantity || quantity <= 0) {
+                alert('❌ Please enter a valid quantity');
+                return;
+            }
+
+            if (!deliveryAddress) {
+                alert('❌ Please enter your delivery address');
+                return;
+            }
+
+            if (!confirm(`Confirm order of ${quantity} units?\nDelivery to: ${deliveryAddress}\nPayment: ${paymentMethod}`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/orders/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId,
+                        quantity,
+                        deliveryAddress,
+                        paymentMethod
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`✅ Order placed successfully! Total: ₹${result.totalPrice.toFixed(2)}\nEstimated delivery: 5 business days`);
+                    window.location.reload();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to place order. Please try again.');
+            }
+        }
+
+        // Search and Filter Functionality
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const maxPrice = parseFloat(document.getElementById('priceFilter').value) || Infinity;
+            const minQuantity = parseFloat(document.getElementById('quantityFilter').value) || 0;
+
+            const productCards = document.querySelectorAll('.product-card');
+            let visibleCount = 0;
+
+            productCards.forEach(card => {
+                const productType = card.dataset.productType;
+                const price = parseFloat(card.dataset.price);
+                const quantity = parseFloat(card.dataset.quantity);
+
+                const matchesSearch = productType.includes(searchTerm);
+                const matchesPrice = price <= maxPrice;
+                const matchesQuantity = quantity >= minQuantity;
+
+                if (matchesSearch && matchesPrice && matchesQuantity) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update visible count
+            document.getElementById('visibleCount').textContent = visibleCount;
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('priceFilter').value = '';
+            document.getElementById('quantityFilter').value = '';
+            filterProducts();
+        }
+
+        // Attach event listeners
+        document.getElementById('searchInput')?.addEventListener('input', filterProducts);
+        document.getElementById('priceFilter')?.addEventListener('input', filterProducts);
+        document.getElementById('quantityFilter')?.addEventListener('input', filterProducts);
+    </script>
+</body>
+
+</html>

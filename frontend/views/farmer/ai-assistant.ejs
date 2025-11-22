@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Diagnosis - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <style>
+        .symptom-card {
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .symptom-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .symptom-card.selected {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+
+        .diagnosis-result {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #10b981;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">Dashboard</a>
+                    <a href="/animals/add" class="text-gray-700 hover:text-emerald-600 transition">Add Animal</a>
+                    <a href="/guide/medicine-guide" class="text-gray-700 hover:text-emerald-600 transition">Medicine Guide</a>
+                    <a href="/list-product" class="text-gray-700 hover:text-emerald-600 transition">List Product</a>
+                    <a href="/my-products" class="text-gray-700 hover:text-emerald-600 transition">My Products</a>
+                    <a href="/orders/sales" class="text-gray-700 hover:text-emerald-600 transition">Sales</a>
+                    <a href="/marketplace" class="text-gray-700 hover:text-emerald-600 transition">Marketplace</a>
+                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">🩺 AI Disease Diagnosis</h1>
+            <p class="text-gray-600 mt-2">Select the symptoms your cattle is showing to get an AI-powered diagnosis</p>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 mb-8">
+            <div class="flex items-start">
+                <div class="text-3xl mr-4">ℹ️</div>
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-2">How it works:</h3>
+                    <ol class="text-sm text-gray-700 space-y-1">
+                        <li>1. Select one or more symptoms from the list below</li>
+                        <li>2. Click "Diagnose Disease" to get AI analysis</li>
+                        <li>3. View the diagnosis and recommended treatment</li>
+                        <li>4. Click "View Treatment" to see medicine guide</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Symptom Selection -->
+        <div class="card mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Select Symptoms</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="symptomGrid">
+                <div class="symptom-card card bg-white" data-symptom="Loss of appetite">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">🍽️</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Loss of appetite</h3>
+                            <p class="text-sm text-gray-600">Not eating normally</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Fever or high temperature">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">🌡️</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Fever</h3>
+                            <p class="text-sm text-gray-600">High temperature</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Coughing or respiratory issues">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">🫁</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Coughing</h3>
+                            <p class="text-sm text-gray-600">Respiratory problems</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Diarrhea or loose stool">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">💧</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Diarrhea</h3>
+                            <p class="text-sm text-gray-600">Loose stool</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Lethargy or weakness">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">😴</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Lethargy</h3>
+                            <p class="text-sm text-gray-600">Weak, not active</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Reduced milk production">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">🥛</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Low milk</h3>
+                            <p class="text-sm text-gray-600">Reduced production</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Lameness or difficulty walking">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">🦵</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Lameness</h3>
+                            <p class="text-sm text-gray-600">Difficulty walking</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Swelling or inflammation">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">🔴</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Swelling</h3>
+                            <p class="text-sm text-gray-600">Inflammation present</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Discharge from nose or eyes">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">👁️</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Discharge</h3>
+                            <p class="text-sm text-gray-600">Nasal or eye</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptom-card card bg-white" data-symptom="Weight loss">
+                    <div class="flex items-center">
+                        <div class="text-4xl mr-4">⚖️</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Weight loss</h3>
+                            <p class="text-sm text-gray-600">Losing body mass</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-center">
+                <button id="diagnoseBtn" disabled
+                    class="px-10 py-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all duration-300 font-bold text-2xl shadow-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 flex items-center gap-3 border-4 border-emerald-800"
+                    style="background-color: #059669 !important; border-color: #065f46 !important;">
+                    <span class="text-4xl">🩺</span>
+                    <span class="font-bold" style="color: white !important;">Diagnose Disease</span>
+                </button>
+            </div>
+
+            <p id="selectedCount" class="text-center text-gray-600 mt-4">Select at least one symptom</p>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden text-center py-12">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-700 font-semibold">Analyzing symptoms...</p>
+            <p class="text-gray-600 text-sm mt-2">Our AI is reviewing medical knowledge to diagnose the condition</p>
+        </div>
+
+        <!-- Diagnosis Result -->
+        <div id="diagnosisResult" class="hidden diagnosis-result">
+            <div class="card bg-gradient-to-br from-green-50 to-emerald-100 border-l-4 border-green-500">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">📋 Diagnosis Result</h2>
+                
+                <div class="bg-white rounded-lg p-6 mb-4">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-1">Disease Identified:</p>
+                        <h3 id="diseaseName" class="text-3xl font-bold text-emerald-600"></h3>
+                    </div>
+
+                    <div class="border-t pt-4 mb-4">
+                        <p class="text-sm text-gray-600 mb-2">Explanation:</p>
+                        <p id="diseaseExplanation" class="text-gray-900"></p>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <p class="text-sm text-gray-600 mb-2">Recommended Treatment:</p>
+                        <p id="treatmentInfo" class="text-gray-900 font-semibold"></p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4">
+                    <button id="viewTreatmentBtn"
+                        class="flex-1 px-8 py-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all duration-300 font-bold text-xl shadow-xl hover:shadow-2xl transform hover:scale-105 flex items-center justify-center gap-3">
+                        <span class="text-3xl">💊</span>
+                        <span class="text-white">View Treatment in Medicine Guide</span>
+                        <span class="text-2xl">→</span>
+                    </button>
+                    <button id="newDiagnosisBtn"
+                        class="px-8 py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-300 font-bold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 flex items-center justify-center gap-2 opacity-100"
+                        style="background-color: #2563eb !important;">
+                        <span class="text-2xl">🔄</span>
+                        <span class="text-white font-bold" style="color: white !important;">New Diagnosis</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const symptomCards = document.querySelectorAll('.symptom-card');
+        const diagnoseBtn = document.getElementById('diagnoseBtn');
+        const selectedCount = document.getElementById('selectedCount');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const diagnosisResult = document.getElementById('diagnosisResult');
+        const diseaseName = document.getElementById('diseaseName');
+        // confidenceBadge removed
+        const diseaseExplanation = document.getElementById('diseaseExplanation');
+        const treatmentInfo = document.getElementById('treatmentInfo');
+        const viewTreatmentBtn = document.getElementById('viewTreatmentBtn');
+        const newDiagnosisBtn = document.getElementById('newDiagnosisBtn');
+
+        let selectedSymptoms = [];
+        let currentDiagnosis = null;
+
+        // Initialize knowledge base on page load
+        fetch('/api/ai/init')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Failed to initialize knowledge base');
+                }
+            })
+            .catch(error => console.error('Error initializing:', error));
+
+        // Symptom selection
+        symptomCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const symptom = card.dataset.symptom;
+                
+                if (card.classList.contains('selected')) {
+                    card.classList.remove('selected');
+                    selectedSymptoms = selectedSymptoms.filter(s => s !== symptom);
+                } else {
+                    card.classList.add('selected');
+                    selectedSymptoms.push(symptom);
+                }
+
+                updateUI();
+            });
+        });
+
+        function updateUI() {
+            if (selectedSymptoms.length > 0) {
+                diagnoseBtn.disabled = false;
+                selectedCount.textContent = `${selectedSymptoms.length} symptom(s) selected`;
+            } else {
+                diagnoseBtn.disabled = true;
+                selectedCount.textContent = 'Select at least one symptom';
+            }
+        }
+
+        // Diagnose button
+        diagnoseBtn.addEventListener('click', async () => {
+            if (selectedSymptoms.length === 0) return;
+
+            // Show loading
+            loadingIndicator.classList.remove('hidden');
+            diagnosisResult.classList.add('hidden');
+            document.getElementById('symptomGrid').parentElement.style.opacity = '0.5';
+            diagnoseBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/ai/diagnose', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symptoms: selectedSymptoms })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentDiagnosis = data.diagnosis;
+                    showDiagnosis(data.diagnosis);
+                } else {
+                    alert('❌ ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Failed to diagnose. Please try again.');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                document.getElementById('symptomGrid').parentElement.style.opacity = '1';
+            }
+        });
+
+        function showDiagnosis(diagnosis) {
+            diseaseName.textContent = diagnosis.disease;
+            diseaseExplanation.textContent = diagnosis.explanation;
+            treatmentInfo.textContent = diagnosis.treatment;
+
+            // Confidence badge removed per user request
+
+            diagnosisResult.classList.remove('hidden');
+        }
+
+        // View treatment button
+        viewTreatmentBtn.addEventListener('click', () => {
+            if (currentDiagnosis) {
+                // Redirect to medicine guide with disease filter
+                window.location.href = `/guide/medicine-guide?disease=${encodeURIComponent(currentDiagnosis.disease)}`;
+            }
+        });
+
+        // New diagnosis button
+        newDiagnosisBtn.addEventListener('click', () => {
+            // Reset selection
+            symptomCards.forEach(card => card.classList.remove('selected'));
+            selectedSymptoms = [];
+            currentDiagnosis = null;
+            diagnosisResult.classList.add('hidden');
+            updateUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+
+</html>

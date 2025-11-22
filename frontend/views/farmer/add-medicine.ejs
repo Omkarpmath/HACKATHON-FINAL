@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Medicine - <%= animal.tagId %>
+    </title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">Dashboard</a>
+                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <a href="/animals/<%= animal._id %>" class="text-emerald-600 hover:text-emerald-700">← Back to <%=
+                    animal.tagId %></a>
+        </div>
+
+        <div class="card">
+            <h1 class="text-2xl font-bold text-gray-900 mb-6">Add Medical Log</h1>
+
+            <form id="medicineForm">
+                <div class="space-y-4">
+                    <div>
+                        <label for="medicineSelect" class="block text-sm font-medium text-gray-700 mb-1">
+                            Medicine <span class="text-red-500">*</span>
+                        </label>
+                        <select id="medicineSelect" name="medicineName" class="input-field" required>
+                            <option value="">Select a medicine</option>
+                            <% medicines.forEach(med=> { %>
+                                <option value="<%= med.name %>" data-withdrawal="<%= med.withdrawalDays %>"
+                                    data-category="<%= med.category %>">
+                                    <%= med.name %> (<%= med.category %>) - <%= med.withdrawalDays %> days withdrawal
+                                </option>
+                                <% }) %>
+                                    <option value="custom">Custom Medicine</option>
+                        </select>
+                    </div>
+
+                    <div id="customMedicineDiv" style="display: none;">
+                        <label for="customMedicine" class="block text-sm font-medium text-gray-700 mb-1">
+                            Custom Medicine Name
+                        </label>
+                        <input type="text" id="customMedicine" name="customMedicine" class="input-field">
+                    </div>
+
+                    <div id="withdrawalDiv" style="display: none;">
+                        <label for="withdrawalDays" class="block text-sm font-medium text-gray-700 mb-1">
+                            Withdrawal Days <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" id="withdrawalDays" name="withdrawalDays" min="0" class="input-field">
+                    </div>
+
+                    <div>
+                        <label for="dosage" class="block text-sm font-medium text-gray-700 mb-1">
+                            Dosage
+                        </label>
+                        <input type="text" id="dosage" name="dosage" class="input-field" placeholder="e.g., 10ml">
+                    </div>
+
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
+                            Notes
+                        </label>
+                        <textarea id="notes" name="notes" rows="3" class="input-field"
+                            placeholder="Additional notes about this treatment"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex space-x-4">
+                    <button type="button" onclick="submitForm()" class="flex-1 btn-primary">
+                        Add Medicine
+                    </button>
+                    <a href="/animals/<%= animal._id %>" class="flex-1 btn-secondary text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Warning Modal -->
+    <div id="warningModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md mx-4">
+            <div class="text-center">
+                <div class="text-6xl mb-4">⚠️</div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Withdrawal Period Warning</h2>
+                <p class="text-gray-700 mb-2" id="warningText"></p>
+                <div class="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg mb-6">
+                    <strong>Important:</strong> This animal will be <strong>LOCKED</strong> out of the marketplace
+                    during this period.
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="confirmAddMedicine()" class="flex-1 btn-danger">
+                        Confirm & Lock Animal
+                    </button>
+                    <button onclick="closeModal()" class="flex-1 btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let formData = null;
+
+        // Handle medicine selection
+        document.getElementById('medicineSelect').addEventListener('change', function () {
+            const customDiv = document.getElementById('customMedicineDiv');
+            const withdrawalDiv = document.getElementById('withdrawalDiv');
+
+            if (this.value === 'custom') {
+                customDiv.style.display = 'block';
+                withdrawalDiv.style.display = 'block';
+                document.getElementById('customMedicine').required = true;
+                document.getElementById('withdrawalDays').required = true;
+            } else if (this.value) {
+                customDiv.style.display = 'none';
+                withdrawalDiv.style.display = 'none';
+                document.getElementById('customMedicine').required = false;
+                document.getElementById('withdrawalDays').required = false;
+            }
+        });
+
+        function submitForm() {
+            const form = document.getElementById('medicineForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const medicineSelect = document.getElementById('medicineSelect');
+            const selectedOption = medicineSelect.selectedOptions[0];
+
+            let withdrawalDays = 0;
+            let medicineName = medicineSelect.value;
+
+            if (medicineSelect.value === 'custom') {
+                withdrawalDays = parseInt(document.getElementById('withdrawalDays').value);
+                medicineName = document.getElementById('customMedicine').value;
+            } else {
+                withdrawalDays = parseInt(selectedOption.getAttribute('data-withdrawal'));
+            }
+
+            formData = new FormData(form);
+
+            // Show warning modal if withdrawal > 0
+            if (withdrawalDays > 0) {
+                const warningText = `Administering "${selectedOption.getAttribute('data-category') === 'custom' ? medicineName : selectedOption.text.split(' (')[0]}" will lock <%= animal.tagId %> for ${withdrawalDays} day(s).`;
+                document.getElementById('warningText').textContent = warningText;
+                document.getElementById('warningModal').classList.remove('hidden');
+            } else {
+                // No withdrawal, submit directly
+                confirmAddMedicine();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('warningModal').classList.add('hidden');
+        }
+
+        async function confirmAddMedicine() {
+            try {
+                const response = await fetch('/animals/<%= animal._id %>/add-medicine', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`Medicine added successfully! ${data.locked ? 'Animal is now LOCKED for ' + data.withdrawalDays + ' day(s).' : ''}`);
+                    window.location.href = '/animals/<%= animal._id %>';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Failed to add medicine');
+            }
+
+            closeModal();
+        }
+    </script>
+</body>
+
+</html>

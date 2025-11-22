@@ -1,0 +1,19 @@
+{
+    "name": "jeevbandhu-frontend",
+    "version": "1.0.0",
+    "description": "JeevBandhu Frontend - EJS Templates with Tailwind CSS",
+    "main": "index.js",
+    "scripts": {
+        "build": "npx tailwindcss -i ./src/styles.css -o ./public/css/output.css",
+        "watch": "npx tailwindcss -i ./src/styles.css -o ./public/css/output.css --watch"
+    },
+    "keywords": [
+        "tailwind",
+        "ejs"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "tailwindcss": "^3.4.0"
+    }
+}

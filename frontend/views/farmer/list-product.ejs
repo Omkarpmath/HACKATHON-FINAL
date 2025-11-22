@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Product - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gradient-to-br from-emerald-50 via-white to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">Dashboard</a>
+                    <a href="/guide/medicine-guide" class="text-gray-700 hover:text-emerald-600 transition">Medicine
+                        Guide</a>
+                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">📦 List New Product</h1>
+            <p class="text-gray-600 mt-2">Add a product to the bio-safe verified marketplace</p>
+        </div>
+
+        <form id="productForm" class="card">
+            <div id="errorDiv" class="hidden mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"></div>
+
+            <div class="space-y-6">
+                <!-- Source Animal -->
+                <div>
+                    <label for="animalId" class="block text-sm font-medium text-gray-700 mb-1">
+                        🐮 Source Animal <span class="text-red-500">*</span>
+                    </label>
+                    <% if (animals.length===0) { %>
+                        <div class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg">
+                            <strong>⚠️ No healthy animals available.</strong> All your animals are currently under
+                            withdrawal or quarantine.
+                        </div>
+                        <% } else { %>
+                            <select id="animalId" name="animalId" required class="input-field">
+                                <option value="">Select an animal</option>
+                                <% animals.forEach(animal=> { %>
+                                    <option value="<%= animal._id %>">
+                                        <%= animal.tagId %> - <%= animal.species %> (Health: <%= animal.healthScore %>)
+                                    </option>
+                                    <% }) %>
+                            </select>
+                            <p class="mt-1 text-sm text-green-600">✅ Only healthy, verified animals are shown</p>
+                            <% } %>
+                </div>
+
+                <!-- Product Type -->
+                <div>
+                    <label for="productType" class="block text-sm font-medium text-gray-700 mb-1">
+                        🥛 Product Type <span class="text-red-500">*</span>
+                    </label>
+                    <select id="productType" name="productType" required class="input-field">
+                        <option value="">Select product type</option>
+                        <option value="Milk">Milk</option>
+                        <option value="Ghee">Ghee</option>
+                        <option value="Cheese">Cheese</option>
+                        <option value="Butter">Butter</option>
+                        <option value="Paneer">Paneer</option>
+                        <option value="Yogurt">Yogurt</option>
+                        <option value="Meat">Meat</option>
+                        <option value="Eggs">Eggs</option>
+                        <option value="Wool">Wool</option>
+                    </select>
+                </div>
+
+                <!-- Quantity and Unit -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="totalQuantity" class="block text-sm font-medium text-gray-700 mb-1">
+                            📊 Total Quantity <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" id="totalQuantity" name="totalQuantity" required min="0.1" step="0.1"
+                            class="input-field" placeholder="e.g., 50">
+                        <p class="mt-1 text-xs text-gray-500">Total available for sale</p>
+                    </div>
+
+                    <div>
+                        <label for="unit" class="block text-sm font-medium text-gray-700 mb-1">
+                            📏 Unit
+                        </label>
+                        <select id="unit" name="unit" class="input-field">
+                            <option value="liters">Liters</option>
+                            <option value="kg">Kilograms</option>
+                            <option value="units">Units</option>
+                            <option value="dozen">Dozen</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Price Per Unit -->
+                <div>
+                    <label for="pricePerUnit" class="block text-sm font-medium text-gray-700 mb-1">
+                        💰 Price per Unit (₹) <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" id="pricePerUnit" name="pricePerUnit" required min="0.01" step="0.01"
+                        class="input-field" placeholder="e.g., 60">
+                    <p class="mt-1 text-xs text-gray-500">Price per liter/kg/unit</p>
+                </div>
+
+                <!-- Min Order Quantity -->
+                <div>
+                    <label for="minOrderQuantity" class="block text-sm font-medium text-gray-700 mb-1">
+                        📦 Minimum Order Quantity
+                    </label>
+                    <input type="number" id="minOrderQuantity" name="minOrderQuantity" min="0.1" step="0.1" value="1"
+                        class="input-field" placeholder="e.g., 1">
+                    <p class="mt-1 text-xs text-gray-500">Minimum quantity buyers must order</p>
+                </div>
+
+                <!-- Total Value Preview -->
+                <div id="valuePreview" class="hidden p-4 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-700 font-medium">📈 Total Inventory Value:</span>
+                        <span id="totalValue" class="text-2xl font-bold text-emerald-600">₹0</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2" id="valueCalculation"></p>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+                        📝 Description (Optional)
+                    </label>
+                    <textarea id="description" name="description" rows="3" class="input-field"
+                        placeholder="Tell buyers about your product quality, farming practices, etc..."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex space-x-4">
+                <button type="submit" class="flex-1 btn-primary" <%=animals.length===0 ? 'disabled' : '' %>>
+                    ✅ List Product
+                </button>
+                <a href="/dashboard" class="flex-1 btn-secondary text-center">
+                    ❌ Cancel
+                </a>
+            </div>
+        </form>
+
+        <!-- Info Box -->
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 class="font-semibold text-blue-900 mb-2">ℹ️ How Quantity-Based Listing Works</h3>
+            <ul class="text-sm text-blue-800 space-y-1">
+                <li>• Set your <strong>total available quantity</strong> and <strong>price per unit</strong></li>
+                <li>• Buyers can order any amount (above minimum) from your inventory</li>
+                <li>• Available quantity updates automatically after each order</li>
+                <li>• Only bio-safe verified products appear in the marketplace</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const totalQtyInput = document.getElementById('totalQuantity');
+        const pricePerUnitInput = document.getElementById('pricePerUnit');
+        const unitSelect = document.getElementById('unit');
+        const valuePreview = document.getElementById('valuePreview');
+        const totalValue = document.getElementById('totalValue');
+        const valueCalculation = document.getElementById('valueCalculation');
+
+        // Update total value preview
+        function updateValuePreview() {
+            const qty = parseFloat(totalQtyInput.value) || 0;
+            const price = parseFloat(pricePerUnitInput.value) || 0;
+            const unit = unitSelect.value;
+
+            if (qty > 0 && price > 0) {
+                const total = qty * price;
+                totalValue.textContent = `₹${total.toFixed(2)}`;
+                valueCalculation.textContent = `${qty} ${unit} × ₹${price}/${unit} = ₹${total.toFixed(2)}`;
+                valuePreview.classList.remove('hidden');
+            } else {
+                valuePreview.classList.add('hidden');
+            }
+        }
+
+        totalQtyInput.addEventListener('input', updateValuePreview);
+        pricePerUnitInput.addEventListener('input', updateValuePreview);
+        unitSelect.addEventListener('change', updateValuePreview);
+
+        document.getElementById('productForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/list-product', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Product listed successfully in the marketplace!');
+                    window.location.href = '/my-products';
+                } else {
+                    const errorDiv = document.getElementById('errorDiv');
+                    errorDiv.textContent = '❌ ' + result.error + (result.details ? ' ' + result.details : '');
+                    errorDiv.classList.remove('hidden');
+
+                    if (result.blocked) {
+                        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            } catch (error) {
+                alert('❌ Failed to list product. Please try again.');
+            }
+        });
+    </script>
+</body>
+
+</html>

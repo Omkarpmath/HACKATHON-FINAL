@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4">
+        <div class="max-w-md w-full text-center">
+            <div class="text-6xl mb-4">⚠️</div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Oops!</h1>
+            <p class="text-lg text-gray-600 mb-8">
+                <%= message || 'Something went wrong' %>
+            </p>
+            <a href="<%= user && user.role === 'farmer' ? '/dashboard' : user ? '/marketplace' : '/' %>"
+                class="btn-primary">
+                Go Back Home
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

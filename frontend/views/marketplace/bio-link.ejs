@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio-Link Transparency - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/marketplace" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/marketplace" class="text-gray-700 hover:text-emerald-600 transition">← Back to
+                        Marketplace</a>
+                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Trust Badge Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
+                <span class="text-4xl">✅</span>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Bio-Link Transparency Report</h1>
+            <p class="text-gray-600">Complete traceability and medical history</p>
+        </div>
+
+        <!-- Product Info Card -->
+        <div class="card mb-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <%= product.productType %>
+                    </h2>
+                    <p class="text-gray-600">
+                        <%= product.quantity %>
+                            <%= product.unit %> • ₹<%= product.price.toFixed(2) %>
+                    </p>
+                </div>
+                <span class="badge-verified text-base">Antibiotic-Free Verified</span>
+            </div>
+
+            <% if (product.description) { %>
+                <p class="text-gray-700 mt-4">
+                    <%= product.description %>
+                </p>
+                <% } %>
+
+                    <% if (seller) { %>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <span class="text-gray-600">Seller: </span>
+                            <span class="font-semibold">
+                                <%= seller.name %>
+                            </span>
+                        </div>
+                        <% } %>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <!-- Source Animal Info -->
+            <div class="card">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Source Animal</h3>
+
+                <% if (animal) { %>
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-gray-600">Tag ID:</span>
+                            <span class="font-semibold ml-2">
+                                <%= animal.tagId %>
+                            </span>
+                        </div>
+
+                        <div>
+                            <span class="text-gray-600">Species:</span>
+                            <span class="font-semibold ml-2">
+                                <%= animal.species %>
+                            </span>
+                        </div>
+
+                        <% if (animal.breed) { %>
+                            <div>
+                                <span class="text-gray-600">Breed:</span>
+                                <span class="font-semibold ml-2">
+                                    <%= animal.breed %>
+                                </span>
+                            </div>
+                            <% } %>
+
+                                <% if (animal.geneticLineage) { %>
+                                    <div>
+                                        <span class="text-gray-600">Lineage:</span>
+                                        <span class="font-semibold ml-2">
+                                            <%= animal.geneticLineage %>
+                                        </span>
+                                    </div>
+                                    <% } %>
+
+                                        <div class="mt-4">
+                                            <div class="text-sm text-gray-600 mb-1">Current Health Score</div>
+                                            <div class="flex items-center space-x-3">
+                                                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                                    <div class="h-3 rounded-full bg-health-good"
+                                                        style="width: <%= animal.healthScore %>%"></div>
+                                                </div>
+                                                <span class="font-bold text-lg">
+                                                    <%= animal.healthScore %>/100
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+                                            <strong>Status:</strong>
+                                            <%= animal.status %>
+                                        </div>
+                    </div>
+                    <% } else { %>
+                        <p class="text-gray-500">Animal information not available</p>
+                        <% } %>
+            </div>
+
+            <!-- Trust Metrics -->
+            <div class="card">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Trust Metrics</h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600">Withdrawal Compliance</span>
+                            <span class="font-semibold">
+                                <%= stats.complianceRate %>%
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="h-2 rounded-full bg-bio-safe" style="width: <%= stats.complianceRate %>%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-gray-600">Total Medical Records:</span>
+                        <span class="font-semibold ml-2">
+                            <%= stats.totalMedications %>
+                        </span>
+                    </div>
+
+                    <% if (lastVaccination) { %>
+                        <div>
+                            <span class="text-gray-600">Last Vaccination:</span>
+                            <span class="font-semibold ml-2">
+                                <%= new Date(lastVaccination.administeredAt).toLocaleDateString() %>
+                            </span>
+                        </div>
+                        <% } else { %>
+                            <div>
+                                <span class="text-gray-600">Last Vaccination:</span>
+                                <span class="ml-2">No vaccination records</span>
+                            </div>
+                            <% } %>
+
+                                <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div class="flex items-start space-x-2">
+                                        <span class="text-2xl">🛡️</span>
+                                        <div>
+                                            <div class="font-semibold text-blue-900">Transparency Guarantee</div>
+                                            <p class="text-sm text-blue-700 mt-1">
+                                                This product comes from an animal with complete medical history tracking
+                                                and verified withdrawal compliance.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical History Timeline -->
+        <div class="card">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Medical History (Last 5 Records)</h3>
+
+            <% if (medicalLogs.length===0) { %>
+                <div class="text-center py-8 text-gray-500">
+                    <p>✨ No medical treatments recorded</p>
+                    <p class="text-sm mt-2">This animal has a clean medical history</p>
+                </div>
+                <% } else { %>
+                    <div class="space-y-3">
+                        <% medicalLogs.forEach(log=> { %>
+                            <div class="border-l-4 border-emerald-500 bg-gray-50 p-4 rounded-r-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">
+                                            <%= log.medicineName %>
+                                        </h4>
+                                        <p class="text-sm text-gray-600">
+                                            Withdrawal: <%= log.withdrawalDays %> day(s)
+                                                <% if (log.dosage) { %> • Dosage: <%= log.dosage %>
+                                                        <% } %>
+                                        </p>
+                                    </div>
+                                    <span class="text-sm text-gray-500">
+                                        <%= new Date(log.administeredAt).toLocaleDateString() %>
+                                    </span>
+                                </div>
+                                <% if (log.notes) { %>
+                                    <p class="text-sm text-gray-600 mt-2">
+                                        <%= log.notes %>
+                                    </p>
+                                    <% } %>
+                            </div>
+                            <% }) %>
+                    </div>
+
+                    <% if (stats.totalMedications> 5) { %>
+                        <p class="text-sm text-gray-500 text-center mt-4">
+                            Showing last 5 of <%= stats.totalMedications %> total medical records
+                        </p>
+                        <% } %>
+                            <% } %>
+        </div>
+
+        <!-- Back to Marketplace -->
+        <div class="text-center mt-8">
+            <a href="/marketplace" class="btn-primary">
+                ← Back to Marketplace
+            </a>
+        </div>
+    </main>
+</body>
+
+</html>

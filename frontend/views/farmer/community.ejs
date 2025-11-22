@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <style>
+        /* Dropdown menu styles - reusable for all dropdowns */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            z-index: 100;
+            top: 100%;
+            left: 0;
+            margin-top: 0px;
+            /* Remove gap */
+            padding-top: 8px;
+            /* Add internal padding instead */
+        }
+
+        .dropdown-content a {
+            color: #374151;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f3f4f6;
+            color: #059669;
+        }
+
+        .dropdown-content a:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-trigger {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Ensure dropdown stays visible when hovering over content */
+        .dropdown-content:hover {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Enhanced Navigation with Organized Dropdowns -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">🏠 Dashboard</a>
+
+                    <!-- Farm Management Dropdown -->
+                    <div class="dropdown">
+                        <span class="dropdown-trigger text-gray-700 hover:text-emerald-600 transition">🌾 Farm ▾</span>
+                        <div class="dropdown-content">
+                            <a href="/animals/add">➕ Add Animal</a>
+                            <a href="/dashboard">📊 My Animals</a>
+                            <a href="/ai-assistant">🩺 AI Diagnosis</a>
+                            <a href="/guide/medicine-guide">💊 Medicine Guide</a>
+                            <a href="/compliance">✅ Biosecurity</a>
+                        </div>
+                    </div>
+
+                    <!-- Commerce Dropdown -->
+                    <div class="dropdown">
+                        <span class="dropdown-trigger text-gray-700 hover:text-emerald-600 transition">💼 Commerce
+                            ▾</span>
+                        <div class="dropdown-content">
+                            <a href="/marketplace">🛒 Browse Marketplace</a>
+                            <a href="/list-product">➕ List Product</a>
+                            <a href="/my-products">📦 My Products</a>
+                            <a href="/orders/sales">💰 Sales</a>
+                        </div>
+                    </div>
+
+                    <a href="/community" class="text-emerald-600 font-semibold">👥 Community</a>
+                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header with New Post Button -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Farmer Community Forum</h1>
+                <p class="text-gray-600 mt-1">Connect, share, and learn with fellow farmers</p>
+            </div>
+            <button onclick="openNewPostModal()"
+                class="px-8 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-bold text-lg shadow-lg flex items-center gap-2">
+                ➕ New Post
+            </button>
+        </div>
+
+        <!-- Search and Category Filters -->
+        <div class="card mb-8">
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <!-- Search Bar -->
+                <div class="flex-1 w-full">
+                    <input type="text" id="searchInput" placeholder="🔍 Search posts..." value="<%= searchQuery %>"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex gap-2 flex-wrap justify-end">
+                    <a href="/community?category=All"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentCategory === 'All' ? 'bg-emerald-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+                        All
+                    </a>
+                    <a href="/community?category=Disease"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentCategory === 'Disease' ? 'bg-emerald-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+                        Disease
+                    </a>
+                    <a href="/community?category=Feed"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentCategory === 'Feed' ? 'bg-emerald-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+                        Feed
+                    </a>
+                    <a href="/community?category=Breeding"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentCategory === 'Breeding' ? 'bg-emerald-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+                        Breeding
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Posts Feed -->
+        <div id="postsFeed">
+            <% if (posts.length===0) { %>
+                <div class="card text-center py-12">
+                    <div class="text-6xl mb-4">💬</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">No posts yet</h3>
+                    <p class="text-gray-600">Be the first to share something with the community!</p>
+                </div>
+                <% } else { %>
+                    <% posts.forEach(post=> { %>
+                        <div class="card mb-6 hover:shadow-lg transition-shadow">
+                            <!-- Post Header -->
+                            <div class="flex justify-between items-start mb-3">
+                                <h2 class="text-2xl font-bold text-gray-900">
+                                    <%= post.title || 'Untitled Post' %>
+                                </h2>
+                                <% if (post.authorId.toString()===user.id) { %>
+                                    <button onclick="deletePost('<%= post._id %>')"
+                                        class="text-red-600 hover:text-red-700 text-sm font-semibold">
+                                        🗑️ Delete
+                                    </button>
+                                    <% } %>
+                            </div>
+
+                            <!-- Post Content -->
+                            <p class="text-gray-800 mb-4 whitespace-pre-wrap">
+                                <%= post.content %>
+                            </p>
+
+                            <!-- Post Meta -->
+                            <div
+                                class="flex items-center justify-between text-sm text-gray-600 mb-4 pb-4 border-b border-gray-200">
+                                <div class="flex items-center gap-4">
+                                    <span class="font-semibold text-gray-900">
+                                        <%= post.authorName %>
+                                    </span>
+                                    <span>•</span>
+                                    <span>
+                                        <%= new Date(post.createdAt).toLocaleDateString('en-IN', { day: '2-digit' ,
+                                            month: '2-digit' , year: 'numeric' }) %>
+                                    </span>
+                                    <span>•</span>
+                                    <span
+                                        class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-semibold">
+                                        <%= post.category %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Like and Reply Actions -->
+                            <div class="flex items-center gap-6">
+                                <button onclick="toggleLike('<%= post._id %>')"
+                                    class="flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition">
+                                    <span class="text-xl">👍</span>
+                                    <span id="like-count-<%= post._id %>">
+                                        <%= post.likeCount || 0 %>
+                                    </span>
+                                </button>
+                                <button onclick="showReplies('<%= post._id %>')"
+                                    class="flex items-center gap-2 text-gray-600 hover:text-blue  -600 transition">
+                                    <span class="text-xl">💬</span>
+                                    <span id="reply-count-<%= post._id %>">
+                                        <%= post.replyCount || 0 %> replies
+                                    </span>
+                                </button>
+                            </div>
+
+                            <!-- Replies Section (Hidden by default) -->
+                            <div id="replies-<%= post._id %>" class="hidden mt-4 pt-4 border-t border-gray-200">
+                                <h4 class="font-semibold text-gray-900 mb-3">Replies</h4>
+
+                                <!-- Reply Form -->
+                                <div class="mb-4">
+                                    <textarea id="reply-input-<%= post._id %>" rows="2"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                                        placeholder="Write a reply..."></textarea>
+                                    <button onclick="addReply('<%= post._id %>')"
+                                        class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold">
+                                        Post Reply
+                                    </button>
+                                </div>
+
+                                <!-- Existing Replies -->
+                                <div id="reply-list-<%= post._id %>">
+                                    <% if (post.replies && post.replies.length> 0) { %>
+                                        <% post.replies.forEach(reply=> { %>
+                                            <div class="bg-gray-50 p-3 rounded-lg mb-2">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="font-semibold text-sm text-gray-900">
+                                                        <%= reply.authorName %>
+                                                    </span>
+                                                    <span class="text-xs text-gray-500">
+                                                        <%= new Date(reply.createdAt).toLocaleDateString('en-IN') %>
+                                                    </span>
+                                                </div>
+                                                <p class="text-sm text-gray-700">
+                                                    <%= reply.content %>
+                                                </p>
+                                            </div>
+                                            <% }) %>
+                                                <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                            <% } %>
+        </div>
+    </main>
+
+    <!-- New Post Modal -->
+    <div id="newPostModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Create New Post</h2>
+            <form id="newPostForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <input type="text" id="postTitle"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="e.g., My piglets have diarrhea - what should I do?">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select id="postCategory"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="General">General</option>
+                        <option value="Disease">Disease</option>
+                        <option value="Feed">Feed</option>
+                        <option value="Breeding">Breeding</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                    <textarea id="postContent" rows="6"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                        placeholder="Describe your question or share your experience..."></textarea>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="closeNewPostModal()"
+                        class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold text-base">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold text-base">
+                        Post to Community
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // New Post Modal
+        function openNewPostModal() {
+            document.getElementById('newPostModal').classList.remove('hidden');
+        }
+
+        function closeNewPostModal() {
+            document.getElementById('newPostModal').classList.add('hidden');
+            document.getElementById('newPostForm').reset();
+        }
+
+        // Handle new post creation
+        document.getElementById('newPostForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+            const category = document.getElementById('postCategory').value;
+
+            if (!content) {
+                alert('❌ Please write something before posting');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/community/post', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content, category })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Post created successfully!');
+                    window.location.reload();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to create post. Please try again.');
+            }
+        });
+
+        // Toggle like on post
+        async function toggleLike(postId) {
+            try {
+                const response = await fetch(`/api/community/post/${postId}/like`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update like count
+                    const countElement = document.getElementById(`like-count-${postId}`);
+                    const currentCount = parseInt(countElement.textContent);
+                    countElement.textContent = result.liked ? currentCount + 1 : currentCount - 1;
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to like post. Please try again.');
+            }
+        }
+
+        // Show/hide replies
+        function showReplies(postId) {
+            const repliesDiv = document.getElementById(`replies-${postId}`);
+            repliesDiv.classList.toggle('hidden');
+        }
+
+        // Add reply to post
+        async function addReply(postId) {
+            const input = document.getElementById(`reply-input-${postId}`);
+            const content = input.value.trim();
+
+            if (!content) {
+                alert('❌ Please write a reply');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/community/post/${postId}/reply`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Reply added successfully!');
+                    window.location.reload();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to add reply. Please try again.');
+            }
+        }
+
+        // Delete post
+        async function deletePost(postId) {
+            if (!confirm('Are you sure you want to delete this post?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/community/post/${postId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Post deleted successfully!');
+                    window.location.reload();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to delete post. Please try again.');
+            }
+        }
+
+        // Search functionality
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const search = e.target.value;
+                window.location.href = `/community?search=${encodeURIComponent(search)}`;
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 via-white to-emerald-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/marketplace" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/marketplace" class="text-gray-700 hover:text-emerald-600 transition">Marketplace</a>
+                    <a href="/orders/my-orders" class="text-emerald-600 font-semibold">My Orders</a>
+                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">🛒 My Orders</h1>
+            <p class="text-gray-600 mt-2">Track your purchases from verified farmers</p>
+        </div>
+
+        <% if (orders.length===0) { %>
+            <div class="card text-center py-12">
+                <div class="text-6xl mb-4">📦</div>
+                <h2 class="text-2xl font-bold text-gray-700 mb-2">No Orders Yet</h2>
+                <p class="text-gray-600 mb-6">Start shopping in the bio-safe marketplace!</p>
+                <a href="/marketplace" class="btn-primary inline-block">Browse Products</a>
+            </div>
+            <% } else { %>
+                <div class="space-y-4">
+                    <% orders.forEach(order=> { %>
+                        <div class="card">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900">
+                                        <%= order.productType %>
+                                    </h3>
+                                    <p class="text-sm text-gray-600">Order ID: <%= order._id.toString().substring(0,
+                                            8).toUpperCase() %>
+                                    </p>
+                                    <p class="text-sm text-gray-600">Placed on: <%= new
+                                            Date(order.createdAt).toLocaleDateString('en-IN', { year: 'numeric' ,
+                                            month: 'long' , day: 'numeric' }) %>
+                                    </p>
+                                </div>
+                                <div>
+                                    <% if (order.status==='pending' ) { %>
+                                        <span class="badge bg-yellow-100 text-yellow-800">⏳ Pending</span>
+                                        <% } else if (order.status==='confirmed' ) { %>
+                                            <span class="badge bg-blue-100 text-blue-800">✅ Confirmed</span>
+                                            <% } else if (order.status==='delivered' ) { %>
+                                                <span class="badge bg-green-100 text-green-800">🎉 Delivered</span>
+                                                <% } else if (order.status==='cancelled' ) { %>
+                                                    <span class="badge bg-red-100 text-red-800">❌ Cancelled</span>
+                                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600">Quantity</p>
+                                    <p class="text-lg font-bold text-gray-900">
+                                        <%= order.quantity %>
+                                            <%= order.unit %>
+                                    </p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600">Price per <%= order.unit.slice(0, -1) %>
+                                    </p>
+                                    <p class="text-lg font-bold text-gray-900">₹<%= order.pricePerUnit.toFixed(2) %>
+                                    </p>
+                                </div>
+                                <div class="bg-emerald-50 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600">Total Amount</p>
+                                    <p class="text-lg font-bold text-emerald-600">₹<%= order.totalPrice.toFixed(2) %>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Delivery Information -->
+                            <% if (order.deliveryAddress) { %>
+                                <div class="border-t pt-4 mb-4">
+                                    <h4 class="font-semibold text-gray-900 mb-2">📍 Delivery Information</h4>
+                                    <div class="bg-amber-50 p-3 rounded-lg">
+                                        <p class="text-sm text-gray-700">
+                                            <%= order.deliveryAddress %>
+                                        </p>
+                                        <% const estimatedDate=new Date(order.createdAt);
+                                            estimatedDate.setDate(estimatedDate.getDate() + (order.estimatedDeliveryDays
+                                            || 5)); %>
+                                            <p class="text-xs text-gray-600 mt-2">
+                                                Estimated Delivery: <%= estimatedDate.toLocaleDateString('en-IN', {
+                                                    year: 'numeric' , month: 'long' , day: 'numeric' }) %>
+                                            </p>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                    <!-- Payment Information -->
+                                    <div class="border-t pt-4 mb-4">
+                                        <h4 class="font-semibold text-gray-900 mb-2">💳 Payment Information</h4>
+                                        <div class="bg-green-50 p-3 rounded-lg">
+                                            <p class="text-sm text-gray-700">
+                                                <span class="font-medium">Method:</span>
+                                                <%= order.paymentMethod || 'Cash on Delivery' %>
+                                            </p>
+                                            <p class="text-sm text-gray-700 mt-1">
+                                                <span class="font-medium">Status:</span>
+                                                <% if (order.paymentStatus==='completed' ) { %>
+                                                    <span class="text-green-600 font-semibold">✅ Completed</span>
+                                                    <% } else if (order.paymentStatus==='failed' ) { %>
+                                                        <span class="text-red-600 font-semibold">❌ Failed</span>
+                                                        <% } else { %>
+                                                            <span class="text-yellow-600 font-semibold">⏳ Pending</span>
+                                                            <% } %>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Animal Traceability -->
+                                    <div class="border-t pt-4">
+                                        <h4 class="font-semibold text-gray-900 mb-2">🐮 Source Animal Traceability</h4>
+                                        <div class="flex items-center justify-between bg-emerald-50 p-3 rounded-lg">
+                                            <div>
+                                                <p class="text-sm text-gray-600">Tag ID: <span
+                                                        class="font-semibold text-gray-900">
+                                                        <%= order.animalTagId %>
+                                                    </span></p>
+                                                <% if (order.animal) { %>
+                                                    <p class="text-sm text-gray-600">Species: <%= order.animal.species
+                                                            %> |
+                                                            Health Score: <span class="font-semibold text-emerald-600">
+                                                                <%= order.animal.healthScore %>
+                                                            </span></p>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                        </div>
+                        <% }) %>
+                </div>
+                <% } %>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 JeevBandhu. Building trust through transparency.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

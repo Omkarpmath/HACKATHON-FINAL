@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Dashboard - JeevBandhu</title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gradient-to-br from-emerald-50 via-white to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">Dashboard</a>
+                    <a href="/my-products" class="text-gray-700 hover:text-emerald-600 transition">My Products</a>
+                    <a href="/orders/sales" class="text-emerald-600 font-semibold">Sales</a>
+                    <span class="text-gray-600">Hi, <%= user.name %></span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">📊 Sales Dashboard</h1>
+            <p class="text-gray-600 mt-2">Track your orders and revenue</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div
+                class="bg-white rounded-xl shadow-lg border-2 border-emerald-200 p-6 hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600 mb-1">💰 Total Revenue</p>
+                        <p class="text-3xl font-bold text-emerald-600">₹<%= stats.totalRevenue.toFixed(2) %>
+                        </p>
+                    </div>
+                    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                        <span class="text-3xl">💰</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg border-2 border-blue-200 p-6 hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600 mb-1">📦 Total Orders</p>
+                        <p class="text-3xl font-bold text-blue-600">
+                            <%= stats.totalOrders %>
+                        </p>
+                    </div>
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-3xl">📦</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg border-2 border-yellow-200 p-6 hover:shadow-xl transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-600 mb-1">⏳ Pending Orders</p>
+                        <p class="text-3xl font-bold text-yellow-600">
+                            <%= stats.pendingOrders %>
+                        </p>
+                    </div>
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <span class="text-3xl">⏳</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders List -->
+        <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-emerald-50 to-blue-50">
+                <h2 class="text-2xl font-bold text-gray-900">📋 Recent Orders</h2>
+            </div>
+
+            <% if (orders.length===0) { %>
+                <div class="text-center py-16">
+                    <div class="text-6xl mb-4">📦</div>
+                    <h3 class="text-xl font-bold text-gray-700 mb-2">No Sales Yet</h3>
+                    <p class="text-gray-600">List products to start receiving orders!</p>
+                </div>
+                <% } else { %>
+                    <div class="overflow-x-auto p-6">
+                        <table class="min-w-full table-fixed">
+                            <thead class="bg-gray-50 border-b-2 border-gray-200">
+                                <tr>
+                                    <th
+                                        class="w-[12%] px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        Order ID
+                                    </th>
+                                    <th
+                                        class="w-[20%] px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        Product
+                                    </th>
+                                    <th
+                                        class="w-[12%] px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        Quantity
+                                    </th>
+                                    <th
+                                        class="w-[12%] px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        Amount
+                                    </th>
+                                    <th
+                                        class="w-[14%] px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th
+                                        class="w-[12%] px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        Date
+                                    </th>
+                                    <th
+                                        class="w-[18%] px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                                <% orders.forEach((order, index)=> { %>
+                                    <tr
+                                        class="border-b border-gray-100 hover:bg-emerald-50 transition-colors <%= index % 2 === 0 ? 'bg-white' : 'bg-gray-50' %>">
+                                        <td class="px-6 py-5 whitespace-nowrap">
+                                            <span class="text-sm font-bold text-gray-900">#<%=
+                                                    order._id.toString().substring(0, 8).toUpperCase() %></span>
+                                        </td>
+                                        <td class="px-6 py-5 whitespace-nowrap">
+                                            <div class="text-sm font-semibold text-gray-900 mb-1">
+                                                <%= order.productType %>
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                🏷️ <%= order.animalTagId %>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-5 whitespace-nowrap">
+                                            <span class="text-sm text-gray-900 font-medium">
+                                                <%= order.quantity %>
+                                                    <%= order.unit %>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-5 whitespace-nowrap">
+                                            <span class="text-lg font-bold text-emerald-600">
+                                                ₹<%= order.totalPrice.toFixed(2) %>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-5 whitespace-nowrap">
+                                            <% if (order.status==='pending' ) { %>
+                                                <span
+                                                    class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                                    ⏳ Pending
+                                                </span>
+                                                <% } else if (order.status==='confirmed' ) { %>
+                                                    <span
+                                                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                                        ✅ Confirmed
+                                                    </span>
+                                                    <% } else if (order.status==='delivered' ) { %>
+                                                        <span
+                                                            class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                                            🎉 Delivered
+                                                        </span>
+                                                        <% } else if (order.status==='cancelled' ) { %>
+                                                            <span
+                                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                                                ❌ Cancelled
+                                                            </span>
+                                                            <% } %>
+                                        </td>
+                                        <td class="px-6 py-5 whitespace-nowrap">
+                                            <span class="text-sm text-gray-600">
+                                                <%= new Date(order.createdAt).toLocaleDateString('en-IN') %>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-5 whitespace-nowrap">
+                                            <% if (order.status==='pending' ) { %>
+                                                <div class="flex flex-col space-y-2">
+                                                    <button onclick="updateStatus('<%= order._id %>', 'confirmed')"
+                                                        class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-xs transition shadow-sm">
+                                                        ✅ Confirm
+                                                    </button>
+                                                    <button onclick="updateStatus('<%= order._id %>', 'cancelled')"
+                                                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium text-xs transition shadow-sm">
+                                                        ❌ Cancel
+                                                    </button>
+                                                </div>
+                                                <% } else if (order.status==='confirmed' ) { %>
+                                                    <button onclick="updateStatus('<%= order._id %>', 'delivered')"
+                                                        class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-xs transition shadow-sm">
+                                                        🎉 Mark Delivered
+                                                    </button>
+                                                    <% } else { %>
+                                                        <span class="text-gray-400 text-sm">—</span>
+                                                        <% } %>
+                                        </td>
+                                    </tr>
+                                    <!-- Expandable Order Details -->
+                                    <tr class="bg-gray-100 border-b border-gray-200">
+                                        <td colspan="7" class="px-6 py-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <!-- Delivery Information -->
+                                                <% if (order.deliveryAddress) { %>
+                                                    <div class="bg-white p-4 rounded-lg border border-amber-200">
+                                                        <h4 class="font-semibold text-gray-900 mb-2 flex items-center">
+                                                            <span class="text-xl mr-2">📍</span> Delivery Information
+                                                        </h4>
+                                                        <p class="text-sm text-gray-700 mb-2">
+                                                            <%= order.deliveryAddress %>
+                                                        </p>
+                                                        <% const estimatedDate=new Date(order.createdAt);
+                                                            estimatedDate.setDate(estimatedDate.getDate() +
+                                                            (order.estimatedDeliveryDays || 5)); %>
+                                                            <p class="text-xs text-gray-600">
+                                                                Est. Delivery: <%=
+                                                                    estimatedDate.toLocaleDateString('en-IN', {
+                                                                    year: 'numeric' , month: 'long' , day: 'numeric' })
+                                                                    %>
+                                                            </p>
+                                                    </div>
+                                                    <% } %>
+
+                                                        <!-- Payment Information -->
+                                                        <div class="bg-white p-4 rounded-lg border border-green-200">
+                                                            <h4
+                                                                class="font-semibold text-gray-900 mb-2 flex items-center">
+                                                                <span class="text-xl mr-2">💳</span> Payment Details
+                                                            </h4>
+                                                            <p class="text-sm text-gray-700">
+                                                                <span class="font-medium">Method:</span>
+                                                                <%= order.paymentMethod || 'Cash on Delivery' %>
+                                                            </p>
+                                                            <p class="text-sm text-gray-700 mt-1">
+                                                                <span class="font-medium">Status:</span>
+                                                                <% if (order.paymentStatus==='completed' ) { %>
+                                                                    <span class="text-green-600 font-semibold">✅
+                                                                        Completed</span>
+                                                                    <% } else if (order.paymentStatus==='failed' ) { %>
+                                                                        <span class="text-red-600 font-semibold">❌
+                                                                            Failed</span>
+                                                                        <% } else { %>
+                                                                            <span
+                                                                                class="text-yellow-600 font-semibold">⏳
+                                                                                Pending</span>
+                                                                            <% } %>
+                                                            </p>
+                                                        </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 JeevBandhu. Building trust through transparency.</p>
+        </div>
+    </footer>
+
+    <script>
+        async function updateStatus(orderId, newStatus) {
+            if (!confirm(`Are you sure you want to mark this order as ${newStatus}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/orders/${orderId}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`✅ Order ${newStatus} successfully!`);
+                    location.reload();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to update order status');
+            }
+        }
+    </script>
+</body>
+
+</html>
