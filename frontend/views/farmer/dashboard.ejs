@@ -84,6 +84,7 @@
                         <div class="dropdown-content">
                             <a href="/animals/add">➕ Add Animal</a>
                             <a href="/dashboard">📊 My Animals</a>
+                            <a href="/analytics">📈 Analytics</a>
                             <a href="/ai-assistant">🩺 AI Diagnosis</a>
                             <a href="/guide/medicine-guide">💊 Medicine Guide</a>
                             <a href="/compliance">✅ Biosecurity</a>
@@ -306,21 +307,218 @@
                                         <% } %>
 
                                             <!-- Actions -->
-                                            <div class="flex space-x-2">
+                                            <div class="grid grid-cols-2 gap-2 mb-2">
                                                 <a href="/animals/<%= animal._id %>"
-                                                    class="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
+                                                    class="text-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
                                                     View Details
                                                 </a>
                                                 <a href="/animals/<%= animal._id %>/add-medicine"
-                                                    class="flex-1 text-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm">
+                                                    class="text-center px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm">
                                                     Add Medicine
                                                 </a>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <button
+                                                    onclick="openWeightModal('<%= animal._id %>', '<%= animal.name %>')"
+                                                    class="px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm">
+                                                    📊 Log Weight
+                                                </button>
+                                                <button
+                                                    onclick="openFeedModal('<%= animal._id %>', '<%= animal.name %>')"
+                                                    class="px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition text-sm font-semibold shadow-md">
+                                                    🌾 Log Feed
+                                                </button>
                                             </div>
                         </div>
                         <% }) %>
                 </div>
                 <% } %>
     </main>
+
+    <!-- Weight Logging Modal -->
+    <div id="weightModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">📊 Log Animal Weight</h2>
+            <form id="weightForm">
+                <input type="hidden" id="weightAnimalId">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Animal</label>
+                    <input type="text" id="weightAnimalName" disabled
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Weight (kg)</label>
+                    <input type="number" id="weightValue" step="0.1" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input type="date" id="weightDate" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                    <textarea id="weightNotes" rows="2"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeWeightModal()"
+                        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold">
+                        Save Weight
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feed Logging Modal -->
+    <div id="feedModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">🌾 Log Feed Consumption</h2>
+            <form id="feedForm">
+                <input type="hidden" id="feedAnimalId">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Animal</label>
+                    <input type="text" id="feedAnimalName" disabled
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Feed Amount (kg)</label>
+                    <input type="number" id="feedAmount" step="0.1" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Feed Type</label>
+                    <select id="feedType"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+                        <option value="Standard Feed">Standard Feed</option>
+                        <option value="Protein Mix">Protein Mix</option>
+                        <option value="Grains">Grains</option>
+                        <option value="Hay">Hay</option>
+                        <option value="Silage">Silage</option>
+                        <option value="Custom Mix">Custom Mix</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input type="date" id="feedDate" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                    <textarea id="feedNotes" rows="2"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeFeedModal()"
+                        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-semibold">
+                        Save Feed Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('weightDate').valueAsDate = new Date();
+        document.getElementById('feedDate').valueAsDate = new Date();
+
+        // Weight Modal Functions
+        function openWeightModal(animalId, animalName) {
+            document.getElementById('weightAnimalId').value = animalId;
+            document.getElementById('weightAnimalName').value = animalName;
+            document.getElementById('weightModal').classList.remove('hidden');
+        }
+
+        function closeWeightModal() {
+            document.getElementById('weightModal').classList.add('hidden');
+            document.getElementById('weightForm').reset();
+        }
+
+        // Feed Modal Functions
+        function openFeedModal(animalId, animalName) {
+            document.getElementById('feedAnimalId').value = animalId;
+            document.getElementById('feedAnimalName').value = animalName;
+            document.getElementById('feedModal').classList.remove('hidden');
+        }
+
+        function closeFeedModal() {
+            document.getElementById('feedModal').classList.add('hidden');
+            document.getElementById('feedForm').reset();
+        }
+
+        // Handle Weight Form Submission
+        document.getElementById('weightForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                animalId: document.getElementById('weightAnimalId').value,
+                weight: document.getElementById('weightValue').value,
+                recordedDate: document.getElementById('weightDate').value,
+                notes: document.getElementById('weightNotes').value
+            };
+
+            try {
+                const response = await fetch('/api/analytics/weight', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Weight recorded successfully!');
+                    closeWeightModal();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to record weight. Please try again.');
+            }
+        });
+
+        // Handle Feed Form Submission
+        document.getElementById('feedForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                animalId: document.getElementById('feedAnimalId').value,
+                feedAmount: document.getElementById('feedAmount').value,
+                feedType: document.getElementById('feedType').value,
+                feedDate: document.getElementById('feedDate').value,
+                notes: document.getElementById('feedNotes').value
+            };
+
+            try {
+                const response = await fetch('/api/analytics/feed', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Feed consumption recorded successfully!');
+                    closeFeedModal();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to record feed. Please try again.');
+            }
+        });
+    </script>
 </body>
 
 </html>
