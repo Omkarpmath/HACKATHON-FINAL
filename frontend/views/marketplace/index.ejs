@@ -14,7 +14,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="/marketplace" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
-                <div class="flex items-center space-x-6">
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="/marketplace" class="text-emerald-600 font-semibold">Marketplace</a>
                     <% if (user.role==='buyer' ) { %>
                         <a href="/orders/my-orders" class="text-gray-700 hover:text-emerald-600 transition">My
@@ -30,6 +32,39 @@
                                             class="text-red-600 hover:text-red-700 transition">Logout</button>
                                     </form>
                 </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button id="marketplaceMenuBtn"
+                    class="md:hidden flex flex-col justify-center items-center w-10 h-10 hamburger z-50 relative">
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="marketplaceMenu"
+            class="mobile-menu hidden fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-40 md:hidden overflow-y-auto">
+            <div class="flex flex-col p-6 pt-20 space-y-4">
+                <a href="/marketplace" class="text-emerald-600 font-semibold py-2 border-b border-gray-200">🛒
+                    Marketplace</a>
+                <% if (user.role==='buyer' ) { %>
+                    <a href="/orders/my-orders"
+                        class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">📦 My
+                        Orders</a>
+                    <% } %>
+                        <% if (user.role==='farmer' ) { %>
+                            <a href="/dashboard"
+                                class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">🏠
+                                Dashboard</a>
+                            <% } %>
+                                <span class="text-gray-600 px-3 py-2 bg-emerald-50 rounded-full text-center text-sm">Hi,
+                                    <%= user.name %></span>
+                                <form action="/logout" method="POST" class="inline">
+                                    <button type="submit"
+                                        class="w-full text-left text-red-600 hover:text-red-700 font-medium py-2">Logout</button>
+                                </form>
             </div>
         </div>
     </nav>
@@ -366,6 +401,36 @@
         document.getElementById('searchInput')?.addEventListener('input', filterProducts);
         document.getElementById('priceFilter')?.addEventListener('input', filterProducts);
         document.getElementById('quantityFilter')?.addEventListener('input', filterProducts);
+
+        // Mobile menu toggle
+        const marketplaceMenuBtn = document.getElementById('marketplaceMenuBtn');
+        const marketplaceMenu = document.getElementById('marketplaceMenu');
+
+        if (marketplaceMenuBtn && marketplaceMenu) {
+            marketplaceMenuBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                marketplaceMenu.classList.toggle('hidden');
+                marketplaceMenu.classList.toggle('active');
+                marketplaceMenuBtn.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (marketplaceMenu && !marketplaceMenu.contains(e.target) && !marketplaceMenuBtn.contains(e.target)) {
+                    marketplaceMenu.classList.add('hidden');
+                    marketplaceMenu.classList.remove('active');
+                    marketplaceMenuBtn.classList.remove('active');
+                }
+            });
+
+            const marketplaceLinks = marketplaceMenu.querySelectorAll('a');
+            marketplaceLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    marketplaceMenu.classList.add('hidden');
+                    marketplaceMenu.classList.remove('active');
+                    marketplaceMenuBtn.classList.remove('active');
+                });
+            });
+        }
     </script>
 </body>
 

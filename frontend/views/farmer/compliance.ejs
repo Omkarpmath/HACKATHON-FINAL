@@ -96,7 +96,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
-                <div class="flex items-center space-x-6">
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">🏠 Dashboard</a>
 
                     <!-- Farm Management Dropdown -->
@@ -130,6 +132,64 @@
                         <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
                     </form>
                 </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button id="complianceMenuBtn"
+                    class="md:hidden flex flex-col justify-center items-center w-10 h-10 hamburger z-50 relative">
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="complianceMenu"
+            class="mobile-menu hidden fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-40 md:hidden overflow-y-auto">
+            <div class="flex flex-col p-6 pt-20 space-y-4">
+                <a href="/dashboard"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">🏠
+                    Dashboard</a>
+
+                <div class="text-gray-500 text-xs font-semibold uppercase mt-2">Farm Management</div>
+                <a href="/animals/add"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">➕ Add
+                    Animal</a>
+                <a href="/dashboard"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">📊 My
+                    Animals</a>
+                <a href="/ai-assistant"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">🩺 AI
+                    Diagnosis</a>
+                <a href="/guide/medicine-guide"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">💊
+                    Medicine Guide</a>
+                <a href="/compliance" class="text-emerald-600 font-semibold py-2 pl-3 border-b border-gray-200">✅
+                    Biosecurity</a>
+
+                <div class="text-gray-500 text-xs font-semibold uppercase mt-2">Commerce</div>
+                <a href="/marketplace"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">🛒
+                    Browse Marketplace</a>
+                <a href="/list-product"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">➕ List
+                    Product</a>
+                <a href="/my-products"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">📦 My
+                    Products</a>
+                <a href="/orders/sales"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-200">💰
+                    Sales</a>
+
+                <a href="/community"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">👥
+                    Community</a>
+                <span class="text-gray-600 px-3 py-2 bg-emerald-50 rounded-full text-center text-sm">Hi, <%= user.name
+                        %></span>
+                <form action="/logout" method="POST" class="inline">
+                    <button type="submit"
+                        class="w-full text-left text-red-600 hover:text-red-700 font-medium py-2">Logout</button>
+                </form>
             </div>
         </div>
     </nav>
@@ -276,6 +336,36 @@
             } catch (error) {
                 alert('❌ Failed to update compliance. Please try again.');
             }
+        }
+
+        // Mobile menu toggle
+        const complianceMenuBtn = document.getElementById('complianceMenuBtn');
+        const complianceMenu = document.getElementById('complianceMenu');
+
+        if (complianceMenuBtn && complianceMenu) {
+            complianceMenuBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                complianceMenu.classList.toggle('hidden');
+                complianceMenu.classList.toggle('active');
+                complianceMenuBtn.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (complianceMenu && !complianceMenu.contains(e.target) && !complianceMenuBtn.contains(e.target)) {
+                    complianceMenu.classList.add('hidden');
+                    complianceMenu.classList.remove('active');
+                    complianceMenuBtn.classList.remove('active');
+                }
+            });
+
+            const complianceLinks = complianceMenu.querySelectorAll('a');
+            complianceLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    complianceMenu.classList.add('hidden');
+                    complianceMenu.classList.remove('active');
+                    complianceMenuBtn.classList.remove('active');
+                });
+            });
         }
     </script>
 </body>

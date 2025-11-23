@@ -14,7 +14,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
-                <div class="flex items-center space-x-6">
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">Dashboard</a>
                     <a href="/my-products" class="text-gray-700 hover:text-emerald-600 transition">My Products</a>
                     <a href="/orders/sales" class="text-emerald-600 font-semibold">Sales</a>
@@ -23,6 +25,38 @@
                         <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
                     </form>
                 </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button id="salesMenuBtn"
+                    class="md:hidden flex flex-col justify-center items-center w-10 h-10 hamburger z-50 relative">
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="salesMenu"
+            class="mobile-menu hidden fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-40 md:hidden overflow-y-auto">
+            <div class="flex flex-col p-6 pt-20 space-y-4">
+                <a href="/dashboard"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">🏠
+                    Dashboard</a>
+                <a href="/my-products"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">📦 My
+                    Products</a>
+                <a href="/orders/sales" class="text-emerald-600 font-semibold py-2 border-b border-gray-200">💰
+                    Sales</a>
+                <a href="/marketplace"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">🛒
+                    Marketplace</a>
+                <span class="text-gray-600 px-3 py-2 bg-emerald-50 rounded-full text-center text-sm">Hi, <%= user.name
+                        %></span>
+                <form action="/logout" method="POST" class="inline">
+                    <button type="submit"
+                        class="w-full text-left text-red-600 hover:text-red-700 font-medium py-2">Logout</button>
+                </form>
             </div>
         </div>
     </nav>
@@ -89,38 +123,32 @@
                     <p class="text-gray-600">List products to start receiving orders!</p>
                 </div>
                 <% } else { %>
-                    <div class="overflow-x-auto p-6">
+                    <!-- Desktop Table View (hidden on mobile) -->
+                    <div class="hidden md:block overflow-x-auto p-6">
                         <table class="min-w-full table-auto">
                             <thead class="bg-gray-50 border-b-2 border-gray-200">
                                 <tr>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        Order ID
-                                    </th>
+                                        Order ID</th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        Product
-                                    </th>
+                                        Product</th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        Quantity
-                                    </th>
+                                        Quantity</th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        Amount
-                                    </th>
+                                        Amount</th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        Status
-                                    </th>
+                                        Status</th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        Date
-                                    </th>
+                                        Date</th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        Actions
-                                    </th>
+                                        Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
@@ -135,8 +163,7 @@
                                             <div class="text-sm font-semibold text-gray-900 mb-1">
                                                 <%= order.productType %>
                                             </div>
-                                            <div class="text-xs text-gray-500">
-                                                🏷️ <%= order.animalTagId %>
+                                            <div class="text-xs text-gray-500">🏷️ <%= order.animalTagId %>
                                             </div>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap">
@@ -146,31 +173,26 @@
                                             </span>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap">
-                                            <span class="text-lg font-bold text-emerald-600">
-                                                ₹<%= order.totalPrice.toFixed(2) %>
-                                            </span>
+                                            <span class="text-lg font-bold text-emerald-600">₹<%=
+                                                    order.totalPrice.toFixed(2) %></span>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             <% if (order.status==='pending' ) { %>
                                                 <span
-                                                    class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                                    ⏳ Pending
-                                                </span>
+                                                    class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">⏳
+                                                    Pending</span>
                                                 <% } else if (order.status==='confirmed' ) { %>
                                                     <span
-                                                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                                                        ✅ Confirmed
-                                                    </span>
+                                                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">✅
+                                                        Confirmed</span>
                                                     <% } else if (order.status==='delivered' ) { %>
                                                         <span
-                                                            class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                                            🎉 Delivered
-                                                        </span>
+                                                            class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">🎉
+                                                            Delivered</span>
                                                         <% } else if (order.status==='cancelled' ) { %>
                                                             <span
-                                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-                                                                ❌ Cancelled
-                                                            </span>
+                                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">❌
+                                                                Cancelled</span>
                                                             <% } %>
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap">
@@ -182,83 +204,127 @@
                                             <% if (order.status==='pending' ) { %>
                                                 <div class="flex flex-col space-y-2">
                                                     <button onclick="updateStatus('<%= order._id %>', 'confirmed')"
-                                                        class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-xs transition shadow-sm">
-                                                        ✅ Confirm
-                                                    </button>
+                                                        class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-xs transition shadow-sm">✅
+                                                        Confirm</button>
                                                     <button onclick="updateStatus('<%= order._id %>', 'cancelled')"
-                                                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium text-xs transition shadow-sm">
-                                                        ❌ Cancel
-                                                    </button>
+                                                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium text-xs transition shadow-sm">❌
+                                                        Cancel</button>
                                                 </div>
-                                                <% } else if (order.status==='confirmed' ) { %>
-                                                    <button onclick="updateStatus('<%= order._id %>', 'delivered')"
-                                                        class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-xs transition shadow-sm">
-                                                        🎉 Mark Delivered
-                                                    </button>
-                                                    <% } else { %>
-                                                        <span class="text-gray-400 text-sm">—</span>
-                                                        <% } %>
-                                        </td>
-                                    </tr>
-                                    <!-- Expandable Order Details -->
-                                    <tr class="bg-gray-100 border-b border-gray-200">
-                                        <td colspan="7" class="px-6 py-4">
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <!-- Delivery Information -->
-                                                <% if (order.deliveryAddress) { %>
-                                                    <div class="bg-white p-4 rounded-lg border border-amber-200">
-                                                        <h4 class="font-semibold text-gray-900 mb-2 flex items-center">
-                                                            <span class="text-xl mr-2">📍</span> Delivery Information
-                                                        </h4>
-                                                        <p class="text-sm text-gray-700 mb-2">
-                                                            <%= order.deliveryAddress %>
-                                                        </p>
-                                                        <% const estimatedDate=new Date(order.createdAt);
-                                                            estimatedDate.setDate(estimatedDate.getDate() +
-                                                            (order.estimatedDeliveryDays || 5)); %>
-                                                            <p class="text-xs text-gray-600">
-                                                                Est. Delivery: <%=
-                                                                    estimatedDate.toLocaleDateString('en-IN', {
-                                                                    year: 'numeric' , month: 'long' , day: 'numeric' })
-                                                                    %>
-                                                            </p>
-                                                    </div>
-                                                    <% } %>
+                                                </h4>
+                                                <p class="text-sm text-gray-700">
+                                                    <span class="font-medium">Method:</span>
+                                                    <%= order.paymentMethod || 'Cash on Delivery' %>
+                                                </p>
+                                                <p class="text-sm text-gray-700 mt-1">
+                                                    <span class="font-medium">Status:</span>
+                                                    <% if (order.paymentStatus==='completed' ) { %>
+                                                        <span class="text-green-600 font-semibold">✅
+                                                            Completed</span>
+                                                        <% } else if (order.paymentStatus==='failed' ) { %>
+                                                            <span class="text-red-600 font-semibold">❌
+                                                                Failed</span>
+                                                            <% } else { %>
+                                                                <span class="text-yellow-600 font-semibold">⏳
+                                                                    Pending</span>
+                                                                <% } %>
+                                                </p>
+                    </div>
+        </div>
+        </td>
+        </tr>
+        <% } else if (order.status==='confirmed' ) { %>
+            <div class="mt-3 pt-3 border-t border-gray-200">
+                <button onclick="updateStatus('<%= order._id %>', 'delivered')"
+                    class="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-sm transition shadow-sm">🎉
+                    Mark Delivered</button>
+            </div>
+            <% } %>
+                </td>
+                </tr>
+                <% }) %>
+                    </tbody>
+                    </table>
+                    </div>
 
-                                                        <!-- Payment Information -->
-                                                        <div class="bg-white p-4 rounded-lg border border-green-200">
-                                                            <h4
-                                                                class="font-semibold text-gray-900 mb-2 flex items-center">
-                                                                <span class="text-xl mr-2">💳</span> Payment Details
-                                                            </h4>
-                                                            <p class="text-sm text-gray-700">
-                                                                <span class="font-medium">Method:</span>
-                                                                <%= order.paymentMethod || 'Cash on Delivery' %>
-                                                            </p>
-                                                            <p class="text-sm text-gray-700 mt-1">
-                                                                <span class="font-medium">Status:</span>
-                                                                <% if (order.paymentStatus==='completed' ) { %>
-                                                                    <span class="text-green-600 font-semibold">✅
-                                                                        Completed</span>
-                                                                    <% } else if (order.paymentStatus==='failed' ) { %>
-                                                                        <span class="text-red-600 font-semibold">❌
-                                                                            Failed</span>
-                                                                        <% } else { %>
-                                                                            <span
-                                                                                class="text-yellow-600 font-semibold">⏳
-                                                                                Pending</span>
-                                                                            <% } %>
-                                                            </p>
-                                                        </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <% }) %>
-                            </tbody>
-                        </table>
+
+                    <!-- Mobile Card View (hidden on desktop) -->
+                    <div class="md:hidden p-4 space-y-4">
+                        <%orders.forEach((order, index)=> { %>
+                            <div
+                                class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow">
+                                <div class="flex justify-between items-start mb-3 pb-3 border-b border-gray-200">
+                                    <div>
+                                        <div class="text-xs text-gray-500 mb-1">Order ID</div>
+                                        <div class="text-sm font-bold text-gray-900">#
+                                            <%=order._id.toString().substring(0, 8).toUpperCase() %>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <% if (order.status==='pending' ) { %>
+                                            <span
+                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">⏳
+                                                Pending</span>
+                                            <% } else if (order.status==='confirmed' ) { %>
+                                                <span
+                                                    class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">✅
+                                                    Confirmed</span>
+                                                <% } else if (order.status==='delivered' ) { %>
+                                                    <span
+                                                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">🎉
+                                                        Delivered</span>
+                                                    <% } else if (order.status==='cancelled' ) { %>
+                                                        <span
+                                                            class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">❌
+                                                            Cancelled</span>
+                                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="space-y-2 mb-3">
+                                    <div class="flex justify-between"><span
+                                            class="text-sm text-gray-600">Product:</span><span
+                                            class="text-sm font-semibold text-gray-900">
+                                            <%=order.productType %>
+                                        </span></div>
+                                    <div class="flex justify-between"><span
+                                            class="text-sm text-gray-600">Source:</span><span
+                                            class="text-sm text-gray-700">🏷️ <%=order.animalTagId %></span></div>
+                                    <div class="flex justify-between"><span
+                                            class="text-sm text-gray-600">Quantity:</span><span
+                                            class="text-sm font-medium text-gray-900">
+                                            <%=order.quantity %>
+                                                <%=order.unit %>
+                                        </span></div>
+                                    <div class="flex justify-between"><span
+                                            class="text-sm text-gray-600">Amount:</span><span
+                                            class="text-lg font-bold text-emerald-600">₹<%=order.totalPrice.toFixed(2)
+                                                %></span></div>
+                                    <div class="flex justify-between"><span
+                                            class="text-sm text-gray-600">Date:</span><span
+                                            class="text-sm text-gray-700">
+                                            <%=new Date(order.createdAt).toLocaleDateString('en-IN') %>
+                                        </span></div>
+                                </div>
+                                <% if (order.status==='pending' ) { %>
+                                    <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-gray-200">
+                                        <button onclick="updateStatus('<%=order._id %>', 'confirmed')"
+                                            class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-sm transition shadow-sm">✅
+                                            Confirm</button>
+                                        <button onclick="updateStatus('<%=order._id %>', 'cancelled')"
+                                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium text-sm transition shadow-sm">❌
+                                            Cancel</button>
+                                    </div>
+                                    <% } else if (order.status==='confirmed' ) { %>
+                                        <div class="mt-3 pt-3 border-t border-gray-200">
+                                            <button onclick="updateStatus('<%=order._id %>', 'delivered')"
+                                                class="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium text-sm transition shadow-sm">🎉
+                                                Mark Delivered</button>
+                                        </div>
+                                        <% } %>
+                            </div>
+                            <% }) %>
                     </div>
                     <% } %>
-        </div>
+                        </div>
     </main>
 
     <footer class="bg-gray-800 text-white mt-12 py-6">
@@ -291,6 +357,36 @@
             } catch (error) {
                 alert('❌ Failed to update order status');
             }
+        }
+
+        // Mobile menu toggle
+        const salesMenuBtn = document.getElementById('salesMenuBtn');
+        const salesMenu = document.getElementById('salesMenu');
+
+        if (salesMenuBtn && salesMenu) {
+            salesMenuBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                salesMenu.classList.toggle('hidden');
+                salesMenu.classList.toggle('active');
+                salesMenuBtn.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (salesMenu && !salesMenu.contains(e.target) && !salesMenuBtn.contains(e.target)) {
+                    salesMenu.classList.add('hidden');
+                    salesMenu.classList.remove('active');
+                    salesMenuBtn.classList.remove('active');
+                }
+            });
+
+            const salesLinks = salesMenu.querySelectorAll('a');
+            salesLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    salesMenu.classList.add('hidden');
+                    salesMenu.classList.remove('active');
+                    salesMenuBtn.classList.remove('active');
+                });
+            });
         }
     </script>
 </body>

@@ -74,7 +74,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
-                <div class="flex items-center space-x-6">
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">🏠 Dashboard</a>
 
                     <!-- Farm Management Dropdown -->
@@ -108,34 +110,92 @@
                         <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
                     </form>
                 </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button id="communityMenuBtn"
+                    class="md:hidden flex flex-col justify-center items-center w-10 h-10 hamburger z-50 relative">
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="communityMenu"
+            class="mobile-menu hidden fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-40 md:hidden overflow-y-auto">
+            <div class="flex flex-col p-6 pt-20 space-y-4">
+                <a href="/dashboard"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">🏠
+                    Dashboard</a>
+
+                <div class="text-gray-500 text-xs font-semibold uppercase mt-2">Farm Management</div>
+                <a href="/animals/add"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">➕ Add
+                    Animal</a>
+                <a href="/dashboard"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">📊 My
+                    Animals</a>
+                <a href="/ai-assistant"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">🩺 AI
+                    Diagnosis</a>
+                <a href="/guide/medicine-guide"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">💊
+                    Medicine Guide</a>
+                <a href="/compliance"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-200">✅
+                    Biosecurity</a>
+
+                <div class="text-gray-500 text-xs font-semibold uppercase mt-2">Commerce</div>
+                <a href="/marketplace"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">🛒
+                    Browse Marketplace</a>
+                <a href="/list-product"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">➕ List
+                    Product</a>
+                <a href="/my-products"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-100">📦 My
+                    Products</a>
+                <a href="/orders/sales"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 pl-3 border-b border-gray-200">💰
+                    Sales</a>
+
+                <a href="/community" class="text-emerald-600 font-semibold py-2 border-b border-gray-200">👥
+                    Community</a>
+                <span class="text-gray-600 px-3 py-2 bg-emerald-50 rounded-full text-center text-sm">Hi, <%= user.name
+                        %></span>
+                <form action="/logout" method="POST" class="inline">
+                    <button type="submit"
+                        class="w-full text-left text-red-600 hover:text-red-700 font-medium py-2">Logout</button>
+                </form>
             </div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header with New Post Button -->
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Farmer Community Forum</h1>
-                <p class="text-gray-600 mt-1">Connect, share, and learn with fellow farmers</p>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Farmer Community Forum</h1>
+                <p class="text-gray-600 mt-1 text-sm md:text-base">Connect, share, and learn with fellow farmers</p>
             </div>
             <button onclick="openNewPostModal()"
-                class="px-8 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-bold text-lg shadow-lg flex items-center gap-2">
+                class="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-bold text-base shadow-lg flex items-center justify-center gap-2 w-full md:w-auto">
                 ➕ New Post
             </button>
         </div>
 
         <!-- Search and Category Filters -->
-        <div class="card mb-8">
-            <div class="flex flex-col md:flex-row gap-4 items-center">
+        <div class="card mb-6">
+            <div class="flex flex-col gap-4">
                 <!-- Search Bar -->
-                <div class="flex-1 w-full">
+                <div class="w-full">
                     <input type="text" id="searchInput" placeholder="🔍 Search posts..." value="<%= searchQuery %>"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-base">
                 </div>
 
                 <!-- Category Filters -->
-                <div class="flex gap-2 flex-wrap justify-end">
+                <div class="flex gap-2 flex-wrap w-full">
                     <a href="/community?category=All"
                         class="px-4 py-2 rounded-lg text-sm font-semibold transition <%= currentCategory === 'All' ? 'bg-emerald-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
                         All
@@ -224,26 +284,27 @@
                             </div>
 
                             <!-- Replies Section (Hidden by default) -->
-                            <div id="replies-<%= post._id %>" class="hidden mt-4 pt-4 border-t border-gray-200">
-                                <h4 class="font-semibold text-gray-900 mb-3">Replies</h4>
+                            <div id="replies-<%= post._id %>"
+                                class="hidden mt-4 pt-4 border-t border-gray-200 pl-0 md:pl-4">
+                                <h4 class="font-semibold text-gray-900 mb-3 text-base md:text-lg">Replies</h4>
 
                                 <!-- Reply Form -->
                                 <div class="mb-4">
                                     <textarea id="reply-input-<%= post._id %>" rows="2"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm"
                                         placeholder="Write a reply..."></textarea>
                                     <button onclick="addReply('<%= post._id %>')"
-                                        class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold">
+                                        class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold w-full md:w-auto">
                                         Post Reply
                                     </button>
                                 </div>
 
                                 <!-- Existing Replies -->
-                                <div id="reply-list-<%= post._id %>">
+                                <div id="reply-list-<%= post._id %>" class="space-y-2">
                                     <% if (post.replies && post.replies.length> 0) { %>
                                         <% post.replies.forEach(reply=> { %>
-                                            <div class="bg-gray-50 p-3 rounded-lg mb-2">
-                                                <div class="flex items-center gap-2 mb-1">
+                                            <div class="bg-gray-50 p-3 md:p-4 rounded-lg">
+                                                <div class="flex items-center gap-2 mb-1 flex-wrap">
                                                     <span class="font-semibold text-sm text-gray-900">
                                                         <%= reply.authorName %>
                                                     </span>
@@ -251,7 +312,7 @@
                                                         <%= new Date(reply.createdAt).toLocaleDateString('en-IN') %>
                                                     </span>
                                                 </div>
-                                                <p class="text-sm text-gray-700">
+                                                <p class="text-sm text-gray-700 break-words">
                                                     <%= reply.content %>
                                                 </p>
                                             </div>
@@ -441,6 +502,36 @@
                 window.location.href = `/community?search=${encodeURIComponent(search)}`;
             }, 500);
         });
+
+        // Mobile menu toggle
+        const communityMenuBtn = document.getElementById('communityMenuBtn');
+        const communityMenu = document.getElementById('communityMenu');
+
+        if (communityMenuBtn && communityMenu) {
+            communityMenuBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                communityMenu.classList.toggle('hidden');
+                communityMenu.classList.toggle('active');
+                communityMenuBtn.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (communityMenu && !communityMenu.contains(e.target) && !communityMenuBtn.contains(e.target)) {
+                    communityMenu.classList.add('hidden');
+                    communityMenu.classList.remove('active');
+                    communityMenuBtn.classList.remove('active');
+                }
+            });
+
+            const communityLinks = communityMenu.querySelectorAll('a');
+            communityLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    communityMenu.classList.add('hidden');
+                    communityMenu.classList.remove('active');
+                    communityMenuBtn.classList.remove('active');
+                });
+            });
+        }
     </script>
 </body>
 

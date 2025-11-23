@@ -14,7 +14,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="/dashboard" class="text-2xl font-bold text-emerald-600">🐄 JeevBandhu</a>
-                <div class="flex items-center space-x-6">
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="/dashboard" class="text-gray-700 hover:text-emerald-600 transition">Dashboard</a>
                     <a href="/guide/medicine-guide" class="text-gray-700 hover:text-emerald-600 transition">Medicine
                         Guide</a>
@@ -23,6 +25,41 @@
                         <button type="submit" class="text-red-600 hover:text-red-700 transition">Logout</button>
                     </form>
                 </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button id="listProductMenuBtn"
+                    class="md:hidden flex flex-col justify-center items-center w-10 h-10 hamburger z-50 relative">
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700 mb-1"></span>
+                    <span class="block w-6 h-0.5 bg-gray-700"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="listProductMenu"
+            class="mobile-menu hidden fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-40 md:hidden overflow-y-auto">
+            <div class="flex flex-col p-6 pt-20 space-y-4">
+                <a href="/dashboard"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">🏠
+                    Dashboard</a>
+                <a href="/guide/medicine-guide"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">💊 Medicine
+                    Guide</a>
+                <a href="/list-product" class="text-emerald-600 font-semibold py-2 border-b border-gray-200">➕ List
+                    Product</a>
+                <a href="/my-products"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">📦 My
+                    Products</a>
+                <a href="/marketplace"
+                    class="text-gray-700 hover:text-emerald-600 font-medium py-2 border-b border-gray-200">🛒
+                    Marketplace</a>
+                <span class="text-gray-600 px-3 py-2 bg-emerald-50 rounded-full text-center text-sm">Hi, <%= user.name
+                        %></span>
+                <form action="/logout" method="POST" class="inline">
+                    <button type="submit"
+                        class="w-full text-left text-red-600 hover:text-red-700 font-medium py-2">Logout</button>
+                </form>
             </div>
         </div>
     </nav>
@@ -223,6 +260,36 @@
                 alert('❌ Failed to list product. Please try again.');
             }
         });
+
+        // Mobile menu toggle
+        const listProductMenuBtn = document.getElementById('listProductMenuBtn');
+        const listProductMenu = document.getElementById('listProductMenu');
+
+        if (listProductMenuBtn && listProductMenu) {
+            listProductMenuBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                listProductMenu.classList.toggle('hidden');
+                listProductMenu.classList.toggle('active');
+                listProductMenuBtn.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (listProductMenu && !listProductMenu.contains(e.target) && !listProductMenuBtn.contains(e.target)) {
+                    listProductMenu.classList.add('hidden');
+                    listProductMenu.classList.remove('active');
+                    listProductMenuBtn.classList.remove('active');
+                }
+            });
+
+            const listProductLinks = listProductMenu.querySelectorAll('a');
+            listProductLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    listProductMenu.classList.add('hidden');
+                    listProductMenu.classList.remove('active');
+                    listProductMenuBtn.classList.remove('active');
+                });
+            });
+        }
     </script>
 </body>
 
