@@ -25,6 +25,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 
+// Trust proxy - Required for Render deployment
+// This ensures Express recognizes HTTPS requests through Render's reverse proxy
+app.set('trust proxy', 1);
+
 // Session middleware
 app.use(session({
     secret: process.env.SESSION_SECRET || 'jeevbandhu-secret-key-change-this',
@@ -34,7 +38,8 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production' // HTTPS only in production
+        secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+        sameSite: 'lax' // Prevents CSRF while allowing normal navigation
     }
 }));
 
