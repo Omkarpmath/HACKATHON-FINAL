@@ -1,1 +1,0 @@
-{"version":3,"file":"zai-org.d.ts","sourceRoot":"","sources":["../../../src/providers/zai-org.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;GAeG;AACH,OAAO,EAAE,sBAAsB,EAAE,MAAM,qBAAqB,CAAC;AAC7D,OAAO,KAAK,EAAE,YAAY,EAAE,MAAM,aAAa,CAAC;AAIhD,qBAAa,qBAAsB,SAAQ,sBAAsB;;IAKvD,cAAc,CAAC,MAAM,EAAE,YAAY,EAAE,MAAM,EAAE,OAAO,GAAG,MAAM,CAAC,MAAM,EAAE,MAAM,CAAC;IAO7E,SAAS,IAAI,MAAM;CAG5B"}
